@@ -534,7 +534,7 @@
  const scriptURL = "https://script.google.com/macros/s/AKfycbxzDlGuQtoMEv3LfytsqjenAfUlsTDXguLb55ihm6LVOmDWTB9zYoYtyzDpBP0bpbiU/exec";
   
  let pratosSelecionados = []; // Array para armazenar os pratos selecionados
-document.addEventListener("DOMContentLoaded", function () {
+ document.addEventListener("DOMContentLoaded", function () {
   fetch("https://script.google.com/macros/s/AKfycbxD.../exec") // usa a tua URL real
     .then(response => response.json())
     .then(reservas => {
@@ -700,29 +700,41 @@ function salvarPratosSelecionados() {
   document.querySelector('.formulario').style.display = 'block'; // Mostra o formulário novamente
   document.getElementById('btnMenu').style.display = 'block'; // Mostra o botão de administração novamente
 }
-  function enviarReservaParaSheets(nome, pratosSelecionados) {
-    const dias = pratosSelecionados.map(p => p.dia);
-    const nomesPratos = pratosSelecionados.map(p => p.nome);
+  function enviarReservaParaSheets(nomeCliente, pratosSelecionados) {
+  const dias = pratosSelecionados.map(p => p.dia);
+  const pratos = pratosSelecionados.map(p => p.nome);
+  const imagens = pratosSelecionados.map(p => p.imagem); // precisa estar presente nos objetos
 
-    fetch("https://script.google.com/macros/s/AKfycbxzDlGuQtoMEv3LfytsqjenAfUlsTDXguLb55ihm6LVOmDWTB9zYoYtyzDpBP0bpbiU/exec", {
-      method: "POST",
-      mode: "no-cors", // para evitar bloqueios de CORS (mas impede ver a resposta)
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        cliente: nome,
-        pratos: nomesPratos,
-        dias: dias
-      })
-    })
-    .then(() => {
-      console.log("Reserva enviada para o Sheets com sucesso!");
-    })
-    .catch(err => {
-      console.error("Erro ao enviar reserva:", err);
-    });
-  }
+  const dados = pratosSelecionados.map(p => ({
+    nomeCliente: nomeCliente,
+    nomePrato: p.nome,
+    diaSemana: p.dia,
+    imagem: p.imagem // novo campo
+  }));
+
+  fetch("https://script.google.com/macros/s/AKfycbxDjtiqeWD1tXPboYtzypzBPBpbiU/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(dados)
+  })
+  .then(() => {
+    console.log("Reserva enviada para o Sheets com sucesso!");
+  })
+  .catch(err => {
+    console.error("Erro ao enviar reserva:", err);
+  });
+}
+
+function mostrarImagem(prato) {
+  const img = document.createElement("img");
+  img.src = prato.imagem;
+  img.alt = prato.nomePrato;
+  img.width = 100;
+  document.body.appendChild(img);
+}
 
 // Função auxiliar para obter o nome do dia da semana
 function getDiaSemanaTexto(dia) {
