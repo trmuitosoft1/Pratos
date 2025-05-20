@@ -523,6 +523,7 @@
   <h3>Lista de Reservas</h3>
   <ul id="reservasList"></ul>
 </div>
+<div id="resumo"></div>
   
   <div class="footer-text">
     <img src="https://www.trsoft.pt/TRREST_20novo00.png?v=30c3kwurp0v9oh" alt="TR Rest Logo" style="height: 40px;">
@@ -533,7 +534,30 @@
  const scriptURL = "https://script.google.com/macros/s/AKfycbxzDlGuQtoMEv3LfytsqjenAfUlsTDXguLb55ihm6LVOmDWTB9zYoYtyzDpBP0bpbiU/exec";
   
  let pratosSelecionados = []; // Array para armazenar os pratos selecionados
+document.addEventListener("DOMContentLoaded", function () {
+  fetch("https://script.google.com/macros/s/AKfycbxD.../exec") // usa a tua URL real
+    .then(response => response.json())
+    .then(reservas => {
+      const diaAtual = 'Segunda-feira'; // ou usa função para obter dinamicamente
+      const reservasDoDia = reservas.filter(r => r.dia === diaAtual);
 
+      const container = document.getElementById("resumo"); // ID onde mostrar os pratos
+      if (reservasDoDia.length === 0) {
+        container.innerText = "Nenhuma reserva para hoje.";
+        return;
+      }
+
+      // Exibir os pratos
+      reservasDoDia.forEach(r => {
+        const p = document.createElement("p");
+        p.innerText = `${r.nome} - ${r.prato}`;
+        container.appendChild(p);
+      });
+    })
+    .catch(err => {
+      console.error("Erro ao carregar reservas:", err);
+    });
+});
 
  function mostrarTodosPratos() {
       document.getElementById('opcoesAdmin').style.display = 'none';
