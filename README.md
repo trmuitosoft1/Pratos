@@ -1,2 +1,0 @@
-# Pratos
-Pratos da semana 
