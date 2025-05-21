@@ -523,7 +523,6 @@
   <h3>Lista de Reservas</h3>
   <ul id="reservasList"></ul>
 </div>
-<div id="resumo"></div>
   
   <div class="footer-text">
     <img src="https://www.trsoft.pt/TRREST_20novo00.png?v=30c3kwurp0v9oh" alt="TR Rest Logo" style="height: 40px;">
@@ -531,33 +530,25 @@
 </div>
 
 <script>
+ const linksImagens = {
+  "Swift 2 Card Tapping": "https://tmrutosoft1.github.io/Pratos/images/Swift%202%20Card%20Tapping.jpg",
+  "Sem título": "https://tmrutosoft1.github.io/Pratos/images/Sem%20t%C3%ADtulo.jpg",
+  "bar": "https://tmrutosoft1.github.io/Pratos/images/bar.jpg",
+  "imug": "https://tmrutosoft1.github.io/Pratos/images/imug.jpg",
+  "pinter_10.jpg": "https://tmrutosoft1.github.io/Pratos/images/pinter_10.jpg",
+  "transfer (1)": "https://tmrutosoft1.github.io/Pratos/images/transfer%20(1).jpg",
+  "transfer (2)": "https://tmrutosoft1.github.io/Pratos/images/transfer%20(2).jpg",
+  "transfer (3)": "https://tmrutosoft1.github.io/Pratos/images/transfer%20(3).jpg",
+  "transfer (4)": "https://tmrutosoft1.github.io/Pratos/images/transfer%20(4).jpg",
+  "transfer (5)": "https://tmrutosoft1.github.io/Pratos/images/transfer%20(5).jpg",
+  "transfer (6)": "https://tmrutosoft1.github.io/Pratos/images/transfer%20(6).jpg"
+};
+
+localStorage.setItem('imagens', JSON.stringify(linksImagens));
  const scriptURL = "https://script.google.com/macros/s/AKfycbxzDlGuQtoMEv3LfytsqjenAfUlsTDXguLb55ihm6LVOmDWTB9zYoYtyzDpBP0bpbiU/exec";
   
  let pratosSelecionados = []; // Array para armazenar os pratos selecionados
- document.addEventListener("DOMContentLoaded", function () {
-  fetch("https://script.google.com/macros/s/AKfycbxD.../exec") // usa a tua URL real
-    .then(response => response.json())
-    .then(reservas => {
-      const diaAtual = 'Segunda-feira'; // ou usa função para obter dinamicamente
-      const reservasDoDia = reservas.filter(r => r.dia === diaAtual);
 
-      const container = document.getElementById("resumo"); // ID onde mostrar os pratos
-      if (reservasDoDia.length === 0) {
-        container.innerText = "Nenhuma reserva para hoje.";
-        return;
-      }
-
-      // Exibir os pratos
-      reservasDoDia.forEach(r => {
-        const p = document.createElement("p");
-        p.innerText = `${r.nome} - ${r.prato}`;
-        container.appendChild(p);
-      });
-    })
-    .catch(err => {
-      console.error("Erro ao carregar reservas:", err);
-    });
-});
 
  function mostrarTodosPratos() {
       document.getElementById('opcoesAdmin').style.display = 'none';
@@ -700,25 +691,39 @@ function salvarPratosSelecionados() {
   document.querySelector('.formulario').style.display = 'block'; // Mostra o formulário novamente
   document.getElementById('btnMenu').style.display = 'block'; // Mostra o botão de administração novamente
 }
-  function enviarReservaParaSheets(nomeCliente, pratosSelecionados) {
+function enviarReservaParaSheets(nome, pratosSelecionados) {
   const dias = pratosSelecionados.map(p => p.dia);
-  const pratos = pratosSelecionados.map(p => p.nome);
-  const imagens = pratosSelecionados.map(p => p.imagem); // precisa estar presente nos objetos
+  const nomesPratos = pratosSelecionados.map(p => p.nome);
 
-  const dados = pratosSelecionados.map(p => ({
-    nomeCliente: nomeCliente,
-    nomePrato: p.nome,
-    diaSemana: p.dia,
-    imagem: p.imagem // novo campo
-  }));
+  // Dicionário com os links fixos das imagens
+  const linksImagens = {
+    "bar": "https://i.imgur.com/Ahj4VO5.jpg",
+    "img": "https://i.imgur.com/r1dnPe4.jpg",
+    "transferir": "https://i.imgur.com/M5UESMV.jpg",
+    "transferir (4)": "https://i.imgur.com/OCqk4NP.jpg",
+    "transferir (3)": "https://i.imgur.com/kSftjBj.jpg",
+    "transferir (2)": "https://i.imgur.com/1bTEdzg.jpg",
+    "transferir (1)": "https://i.imgur.com/CsDAcPj.jpg",
+    "Swift 2 card tapping": "https://i.imgur.com/FrQ3Eob.jpg",
+   "Sem título":" https://i.imgur.com/XCHuu8Q.jpg"
+  };
 
-  fetch("https://script.google.com/macros/s/AKfycbxDjtiqeWD1tXPboYtzypzBPBpbiU/exec", {
+  // Associa cada nome de prato ao link da imagem correspondente
+  const imagens = nomesPratos.map(nomePrato => linksImagens[nomePrato] || '');
+
+  // Envia os dados para o Google Sheets via Apps Script
+  fetch("https://script.google.com/macros/s/AKfycbxzDlGuQtoMEv3LfytsqjenAfUlsTDXguLb55ihm6LVOmDWTB9zYoYtyzDpBP0bpbiU/exec", {
     method: "POST",
-    mode: "no-cors",
+    mode: "no-cors", // para evitar bloqueios de CORS (mas impede ver a resposta)
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(dados)
+    body: JSON.stringify({
+      cliente: nome,
+      pratos: nomesPratos,
+      dias: dias,
+      imagens: imagens  // <-- links fixos aqui
+    })
   })
   .then(() => {
     console.log("Reserva enviada para o Sheets com sucesso!");
@@ -726,14 +731,6 @@ function salvarPratosSelecionados() {
   .catch(err => {
     console.error("Erro ao enviar reserva:", err);
   });
-}
-
-function mostrarImagem(prato) {
-  const img = document.createElement("img");
-  img.src = prato.imagem;
-  img.alt = prato.nomePrato;
-  img.width = 100;
-  document.body.appendChild(img);
 }
 
 // Função auxiliar para obter o nome do dia da semana
