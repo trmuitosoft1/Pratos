@@ -678,7 +678,7 @@ function enviarReservaParaSheets(nome, pratosSelecionados) {
   const dias = pratosSelecionados.map(p => p.dia);
   const nomesPratos = pratosSelecionados.map(p => p.nome);
 
-  // Links públicos das imagens no GitHub Pages (usado apenas no frontend)
+  // Links públicos das imagens no GitHub Pages
   const linksImagens = {
     "Bacalhau": "https://trmuitosoft1.github.io/Pratos/Imagens/bacalhau.png",
     "Bitoque": "https://trmuitosoft1.github.io/Pratos/Imagens/bitoque.png",
@@ -687,43 +687,53 @@ function enviarReservaParaSheets(nome, pratosSelecionados) {
     "Lasanha": "https://trmuitosoft1.github.io/Pratos/Imagens/lasanha.png"
   };
 
-  // Podes continuar a usar os links para exibir imagens no frontend
-  const imagens = nomesPratos.map(nomePrato => linksImagens[nomePrato] || '');
+  // Função para capitalizar a primeira letra
+  function capitalizeFirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  }
 
-  // Envia apenas os dados essenciais para o Google Sheets
+  // Corrigir nomes dos pratos para correspondência com os links
+  const imagens = nomesPratos.map(nomePrato => {
+    const nomeCorrigido = capitalizeFirst(nomePrato.trim());
+    return linksImagens[nomeCorrigido] || '';
+  });
+
+  // Envia os dados para o Google Sheets
   fetch("https://script.google.com/macros/s/AKfycbxzDlGuQtoMEv3LfytsqjenAfUlsTDXguLb55ihm6LVOmDWTB9zYoYtyzDpBP0bpbiU/exec", {
     method: "POST",
     mode: "no-cors",
     headers: {
       "Content-Type": "application/json"
     },
-body: JSON.stringify({
-  cliente: nome,
-  pratos: nomesPratos,
-  dias: dias,
-  imagens: imagens
-})
+    body: JSON.stringify({
+      cliente: nome,
+      pratos: nomesPratos,
+      dias: dias,
+      imagens: imagens
+    })
   })
-  .then(() => {
-    console.log("Reserva enviada para o Sheets com sucesso!");
+  .then(response => response.text())
+  .then(data => {
+    console.log("Resposta do servidor:", data);
   })
   .catch(err => {
     console.error("Erro ao enviar reserva:", err);
   });
 
+  // Exibe as imagens no container de confirmação
   const container = document.getElementById('imagens-confirmacao');
-if (container) {
-  container.innerHTML = ''; // limpa antes de mostrar novas imagens
-  imagens.forEach(link => {
-    const img = document.createElement('img');
-    img.src = link;
-    img.style.width = '150px';
-    img.style.margin = '10px';
-    container.appendChild(img);
-  });
-} else {
-  console.warn("Container de imagens não encontrado.");
-}
+  if (container) {
+    container.innerHTML = ''; // limpa antes de mostrar novas imagens
+    imagens.forEach(link => {
+      const img = document.createElement('img');
+      img.src = link;
+      img.style.width = '150px';
+      img.style.margin = '10px';
+      container.appendChild(img);
+    });
+  } else {
+    console.warn("Container de imagens não encontrado.");
+  }
 }
 function carregarPratosRegistrados() {
   fetch("https://script.google.com/macros/s/AKfycbxzDlGuQtoMEv3LfytsqjenAfUlsTDXguLb55ihm6LVOmDWTB9zYoYtyzDpBP0bpbiU/exec")
