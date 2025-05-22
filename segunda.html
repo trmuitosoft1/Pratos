@@ -675,10 +675,9 @@ function salvarPratosSelecionados() {
 }
 
 function enviarReservaParaSheets(nome, pratosSelecionados) {
-  const dias = pratosSelecionados.map(p => p.dia);
   const nomesPratos = pratosSelecionados.map(p => p.nome);
+  const dias = pratosSelecionados.map(p => p.dia);
 
-  // Links públicos das imagens no GitHub Pages
   const linksImagens = {
     "Bacalhau": "https://trmuitosoft1.github.io/Pratos/Imagens/bacalhau.png",
     "Bitoque": "https://trmuitosoft1.github.io/Pratos/Imagens/bitoque.png",
@@ -687,43 +686,29 @@ function enviarReservaParaSheets(nome, pratosSelecionados) {
     "Lasanha": "https://trmuitosoft1.github.io/Pratos/Imagens/lasanha.png"
   };
 
-  // Função para capitalizar a primeira letra
-  function capitalizeFirst(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-  }
+  const imagens = nomesPratos.map(nomePrato => linksImagens[nomePrato] || '');
 
-  // Corrigir nomes dos pratos para correspondência com os links
-  const imagens = nomesPratos.map(nomePrato => {
-    const nomeCorrigido = capitalizeFirst(nomePrato.trim());
-    return linksImagens[nomeCorrigido] || '';
-  });
+  // ✅ Mantém o formato que já estava funcionando
+  const dadosParaEnviar = {
+    cliente: nome,
+    pratos: nomesPratos,
+    dias: dias,
+    imagens: imagens
+  };
 
-  // Envia os dados para o Google Sheets
   fetch("https://script.google.com/macros/s/AKfycbxzDlGuQtoMEv3LfytsqjenAfUlsTDXguLb55ihm6LVOmDWTB9zYoYtyzDpBP0bpbiU/exec", {
     method: "POST",
     mode: "no-cors",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-      cliente: nome,
-      pratos: nomesPratos,
-      dias: dias,
-      imagens: imagens
-    })
-  })
-  .then(response => response.text())
-  .then(data => {
-    console.log("Resposta do servidor:", data);
-  })
-  .catch(err => {
-    console.error("Erro ao enviar reserva:", err);
+    body: JSON.stringify(dadosParaEnviar)
   });
 
-  // Exibe as imagens no container de confirmação
+  // Mostrar as imagens no frontend (confirmar visualmente)
   const container = document.getElementById('imagens-confirmacao');
   if (container) {
-    container.innerHTML = ''; // limpa antes de mostrar novas imagens
+    container.innerHTML = '';
     imagens.forEach(link => {
       const img = document.createElement('img');
       img.src = link;
