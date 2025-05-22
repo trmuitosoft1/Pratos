@@ -1129,7 +1129,13 @@ function ativarPrato(prato) {
     function voltar() {
       window.history.back(); // Volta para a página anterior
     }
-pratos.forEach(prato => {
+const urlParams = new URLSearchParams(window.location.search);
+const prato = {
+  nome: urlParams.get("nome"),
+  dia: urlParams.get("dia"),
+  imagem: urlParams.get("imagem")
+};
+    pratos.forEach(prato => {
   const container = document.getElementById(prato.dia);
   if (container) {
     const img = document.createElement('img');
