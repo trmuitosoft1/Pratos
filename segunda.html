@@ -429,26 +429,43 @@
 
 <label for="diaSemanaCliente">Escolha os dias que pretende ver os pratos:</label>
 <div id="diaSemanaCliente" class="checkbox-container">
-  <label class="custom-checkbox">
+  <label class="custom-checkbox" id="segunda-feira">
     <input type="checkbox" value="1">
     <span>Segunda-feira</span>
   </label>
-  <label class="custom-checkbox">
+  <label class="custom-checkbox" id="terca-feira">
     <input type="checkbox" value="2">
     <span>Terça-feira</span>
   </label>
-  <label class="custom-checkbox">
+  <label class="custom-checkbox" id="quarta-feira">
     <input type="checkbox" value="3">
     <span>Quarta-feira</span>
   </label>
-  <label class="custom-checkbox">
+  <label class="custom-checkbox" id="quinta-feira">
     <input type="checkbox" value="4">
     <span>Quinta-feira</span>
   </label>
-  <label class="custom-checkbox">
+  <label class="custom-checkbox" id="sexta-feira">
     <input type="checkbox" value="5">
     <span>Sexta-feira</span>
   </label>
+</div>
+
+<div id="pratos-por-dia">
+  <h3>Segunda-feira</h3>
+  <div id="segunda-feira" class="container-dia"></div>
+
+  <h3>Terça-feira</h3>
+  <div id="terca-feira" class="container-dia"></div>
+
+  <h3>Quarta-feira</h3>
+  <div id="quarta-feira" class="container-dia"></div>
+
+  <h3>Quinta-feira</h3>
+  <div id="quinta-feira" class="container-dia"></div>
+
+  <h3>Sexta-feira</h3>
+  <div id="sexta-feira" class="container-dia"></div>
 </div>
 
 <button id="btnVer" onclick="submeter()">Ver Prato</button>
@@ -1129,22 +1146,17 @@ function ativarPrato(prato) {
     function voltar() {
       window.history.back(); // Volta para a página anterior
     }
- const imagens = [
-    "https://trmuitosoft1.github.io/Pratos/Imagens/bacalhau.png",
-    "https://trmuitosoft1.github.io/Pratos/Imagens/cozido.png"
-  ];
-
-  const container = document.getElementById('imagens-confirmacao');
+pratos.forEach(prato => {
+  const container = document.getElementById(prato.dia);
   if (container) {
-    container.innerHTML = '';
-    imagens.forEach(link => {
-      const img = document.createElement('img');
-      img.src = link;
-      img.style.width = '150px';
-      img.style.margin = '10px';
-      container.appendChild(img);
-    });
+    const img = document.createElement('img');
+    img.src = prato.imagem;
+    img.style.width = '150px';
+    img.style.margin = '10px';
+    img.alt = `Prato de ${prato.dia}`;
+    container.appendChild(img);
   }
+});
 </script>
 </body>
 </html>
