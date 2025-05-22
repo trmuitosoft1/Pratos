@@ -523,12 +523,18 @@
   <h3>Lista de Reservas</h3>
   <ul id="reservasList"></ul>
 </div>
+<div id="pratos-segunda">Carregando...</div>
+<div id="pratos-terca">Carregando...</div>
+<div id="pratos-quarta">Carregando...</div>
+<div id="pratos-quinta">Carregando...</div>
+<div id="pratos-sexta">Carregando...</div>
   
   <div class="footer-text">
     <img src="https://www.trsoft.pt/TRREST_20novo00.png?v=30c3kwurp0v9oh" alt="TR Rest Logo" style="height: 40px;">
   </div>
 </div>
-
+<div id="imagens-confirmacao" style="margin: 20px auto; text-align: center;"></div>
+</body>
 <script>
  const linksImagens = {
   "Swift 2 Card Tapping": "https://tmrutosoft1.github.io/Pratos/images/Swift%202%20Card%20Tapping.jpg",
@@ -691,38 +697,34 @@ function salvarPratosSelecionados() {
   document.querySelector('.formulario').style.display = 'block'; // Mostra o formulário novamente
   document.getElementById('btnMenu').style.display = 'block'; // Mostra o botão de administração novamente
 }
+
 function enviarReservaParaSheets(nome, pratosSelecionados) {
   const dias = pratosSelecionados.map(p => p.dia);
   const nomesPratos = pratosSelecionados.map(p => p.nome);
 
-  // Dicionário com os links fixos das imagens
+  // Links públicos das imagens no GitHub Pages (usado apenas no frontend)
   const linksImagens = {
-    "bar": "https://i.imgur.com/Ahj4VO5.jpg",
-    "img": "https://i.imgur.com/r1dnPe4.jpg",
-    "transferir": "https://i.imgur.com/M5UESMV.jpg",
-    "transferir (4)": "https://i.imgur.com/OCqk4NP.jpg",
-    "transferir (3)": "https://i.imgur.com/kSftjBj.jpg",
-    "transferir (2)": "https://i.imgur.com/1bTEdzg.jpg",
-    "transferir (1)": "https://i.imgur.com/CsDAcPj.jpg",
-    "Swift 2 card tapping": "https://i.imgur.com/FrQ3Eob.jpg",
-   "Sem título":" https://i.imgur.com/XCHuu8Q.jpg"
+    "Bacalhau": "https://trmuitosoft1.github.io/Pratos/Imagens/bacalhau.png",
+    "Bitoque": "https://trmuitosoft1.github.io/Pratos/Imagens/bitoque.png",
+    "Cozido": "https://trmuitosoft1.github.io/Pratos/Imagens/cozido.png",
+    "Frango": "https://trmuitosoft1.github.io/Pratos/Imagens/frango.png",
+    "Lasanha": "https://trmuitosoft1.github.io/Pratos/Imagens/lasanha.png"
   };
 
-  // Associa cada nome de prato ao link da imagem correspondente
+  // Podes continuar a usar os links para exibir imagens no frontend
   const imagens = nomesPratos.map(nomePrato => linksImagens[nomePrato] || '');
 
-  // Envia os dados para o Google Sheets via Apps Script
+  // Envia apenas os dados essenciais para o Google Sheets
   fetch("https://script.google.com/macros/s/AKfycbxzDlGuQtoMEv3LfytsqjenAfUlsTDXguLb55ihm6LVOmDWTB9zYoYtyzDpBP0bpbiU/exec", {
     method: "POST",
-    mode: "no-cors", // para evitar bloqueios de CORS (mas impede ver a resposta)
+    mode: "no-cors",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
       cliente: nome,
       pratos: nomesPratos,
-      dias: dias,
-      imagens: imagens  // <-- links fixos aqui
+      dias: dias
     })
   })
   .then(() => {
@@ -731,7 +733,51 @@ function enviarReservaParaSheets(nome, pratosSelecionados) {
   .catch(err => {
     console.error("Erro ao enviar reserva:", err);
   });
+
+  const container = document.getElementById('imagens-confirmacao');
+if (container) {
+  container.innerHTML = ''; // limpa antes de mostrar novas imagens
+  imagens.forEach(link => {
+    const img = document.createElement('img');
+    img.src = link;
+    img.style.width = '150px';
+    img.style.margin = '10px';
+    container.appendChild(img);
+  });
+} else {
+  console.warn("Container de imagens não encontrado.");
 }
+}
+function carregarPratosRegistrados() {
+  fetch("https://script.google.com/macros/s/AKfycbxzDlGuQtoMEv3LfytsqjenAfUlsTDXguLb55ihm6LVOmDWTB9zYoYtyzDpBP0bpbiU/exec")
+    .then(response => response.json())
+    .then(data => {
+      const dias = ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira"];
+
+      dias.forEach(dia => {
+        const container = document.getElementById(`pratos-${dia.toLowerCase().replace('-feira', '')}`);
+        container.innerHTML = '';
+
+        if (data[dia] && data[dia].length > 0) {
+          data[dia].forEach(registro => {
+            const item = document.createElement('div');
+            item.className = 'prato-registrado';
+            item.innerHTML = `
+              <p><strong>${registro.nome}</strong>: ${registro.prato}</p>
+              <img src="${registro.imagem}" alt="${registro.prato}" style="width: 100px;">
+            `;
+            container.appendChild(item);
+          });
+        } else {
+          container.innerHTML = `<p>Não há pratos registrados para ${dia}.</p>`;
+        }
+      });
+    })
+    .catch(error => console.error("Erro ao carregar pratos registrados:", error));
+}
+window.onload = () => {
+  carregarPratosRegistrados();
+};
 
 // Função auxiliar para obter o nome do dia da semana
 function getDiaSemanaTexto(dia) {
