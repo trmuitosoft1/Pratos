@@ -518,16 +518,6 @@
   <ul id="pratos-list"></ul>
   <button onclick="voltarMenu()">Voltar</button>
 </div>
-
-  <div id="listaReservas" style="display: none; margin-top: 20px;">
-  <h3>Lista de Reservas</h3>
-  <ul id="reservasList"></ul>
-</div>
-<div id="pratos-segunda">Carregando...</div>
-<div id="pratos-terca">Carregando...</div>
-<div id="pratos-quarta">Carregando...</div>
-<div id="pratos-quinta">Carregando...</div>
-<div id="pratos-sexta">Carregando...</div>
   
   <div class="footer-text">
     <img src="https://www.trsoft.pt/TRREST_20novo00.png?v=30c3kwurp0v9oh" alt="TR Rest Logo" style="height: 40px;">
@@ -536,21 +526,7 @@
 <div id="imagens-confirmacao" style="margin: 20px auto; text-align: center;"></div>
 </body>
 <script>
- const linksImagens = {
-  "Swift 2 Card Tapping": "https://tmrutosoft1.github.io/Pratos/images/Swift%202%20Card%20Tapping.jpg",
-  "Sem título": "https://tmrutosoft1.github.io/Pratos/images/Sem%20t%C3%ADtulo.jpg",
-  "bar": "https://tmrutosoft1.github.io/Pratos/images/bar.jpg",
-  "imug": "https://tmrutosoft1.github.io/Pratos/images/imug.jpg",
-  "pinter_10.jpg": "https://tmrutosoft1.github.io/Pratos/images/pinter_10.jpg",
-  "transfer (1)": "https://tmrutosoft1.github.io/Pratos/images/transfer%20(1).jpg",
-  "transfer (2)": "https://tmrutosoft1.github.io/Pratos/images/transfer%20(2).jpg",
-  "transfer (3)": "https://tmrutosoft1.github.io/Pratos/images/transfer%20(3).jpg",
-  "transfer (4)": "https://tmrutosoft1.github.io/Pratos/images/transfer%20(4).jpg",
-  "transfer (5)": "https://tmrutosoft1.github.io/Pratos/images/transfer%20(5).jpg",
-  "transfer (6)": "https://tmrutosoft1.github.io/Pratos/images/transfer%20(6).jpg"
-};
 
-localStorage.setItem('imagens', JSON.stringify(linksImagens));
  const scriptURL = "https://script.google.com/macros/s/AKfycbxzDlGuQtoMEv3LfytsqjenAfUlsTDXguLb55ihm6LVOmDWTB9zYoYtyzDpBP0bpbiU/exec";
   
  let pratosSelecionados = []; // Array para armazenar os pratos selecionados
@@ -721,11 +697,12 @@ function enviarReservaParaSheets(nome, pratosSelecionados) {
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-      cliente: nome,
-      pratos: nomesPratos,
-      dias: dias
-    })
+body: JSON.stringify({
+  cliente: nome,
+  pratos: nomesPratos,
+  dias: dias,
+  imagens: imagens
+})
   })
   .then(() => {
     console.log("Reserva enviada para o Sheets com sucesso!");
