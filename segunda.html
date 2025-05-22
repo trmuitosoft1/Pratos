@@ -1129,7 +1129,22 @@ function ativarPrato(prato) {
     function voltar() {
       window.history.back(); // Volta para a página anterior
     }
+ const imagens = [
+    "https://trmuitosoft1.github.io/Pratos/Imagens/bacalhau.png",
+    "https://trmuitosoft1.github.io/Pratos/Imagens/cozido.png"
+  ];
 
+  const container = document.getElementById('imagens-confirmacao');
+  if (container) {
+    container.innerHTML = '';
+    imagens.forEach(link => {
+      const img = document.createElement('img');
+      img.src = link;
+      img.style.width = '150px';
+      img.style.margin = '10px';
+      container.appendChild(img);
+    });
+  }
 </script>
 </body>
 </html>
