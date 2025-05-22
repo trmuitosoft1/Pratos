@@ -518,12 +518,13 @@
   <ul id="pratos-list"></ul>
   <button onclick="voltarMenu()">Voltar</button>
 </div>
-  
+<div id="imagens-confirmacao"></div>
+
   <div class="footer-text">
     <img src="https://www.trsoft.pt/TRREST_20novo00.png?v=30c3kwurp0v9oh" alt="TR Rest Logo" style="height: 40px;">
   </div>
 </div>
-<div id="imagens-confirmacao" style="margin: 20px auto; text-align: center;"></div>
+
 </body>
 <script>
 
@@ -706,17 +707,17 @@ function enviarReservaParaSheets(nome, pratosSelecionados) {
   });
 
   // Mostrar as imagens no frontend (confirmar visualmente)
-  const container = document.getElementById('imagens-confirmacao');
-  if (container) {
-    container.innerHTML = '';
-    imagens.forEach(link => {
-      const img = document.createElement('img');
-      img.src = link;
-      img.style.width = '150px';
-      img.style.margin = '10px';
-      container.appendChild(img);
-    });
-  } else {
+const container = document.getElementById('imagens-confirmacao');
+if (container) {
+  container.innerHTML = '';
+  imagens.forEach(link => {
+    const img = document.createElement('img');
+    img.src = link;
+    img.style.width = '150px';
+    img.style.margin = '10px';
+    container.appendChild(img);
+  });
+} else {
     console.warn("Container de imagens não encontrado.");
   }
 }
