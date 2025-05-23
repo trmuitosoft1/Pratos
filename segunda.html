@@ -557,62 +557,57 @@ function submeter() {
     return;
   }
 
-  // Obter os pratos do localStorage
-  const pratos = JSON.parse(localStorage.getItem('pratos')) || [];
+  fetch("https://script.google.com/macros/s/AKfycbxzDlGuQtoMEv3LfytsqjenAfUlsTDXguLb55ihm6LVOmDWTB9zYoYtyzDpBP0bpbiU/exec")
+    .then(res => res.json())
+    .then(data => {
+      const pratoContainer = document.getElementById('prato');
+      pratoContainer.innerHTML = '';
 
-  const pratoContainer = document.getElementById('prato');
-  pratoContainer.innerHTML = ''; // Limpa o conteúdo anterior
+      diasSemana.forEach(dia => {
+        const nomeDia = getDiaSemanaTexto(dia);
+        const pratosDoDia = data[nomeDia] || [];
 
-  if (diasSemana.length > 0) {
-    diasSemana.forEach(dia => {
-      // Filtrar os pratos para o dia atual, ignorando os ocultos
-      const pratosDoDia = pratos.filter(prato => parseInt(prato.diaSemana) === dia && !prato.oculto);
+        if (pratosDoDia.length > 0) {
+          const diaTitulo = document.createElement('h3');
+          diaTitulo.textContent = `Pratos de ${nomeDia}`;
 
-      if (pratosDoDia.length > 0) {
-        // Criar uma seção para o dia
-        const diaTitulo = document.createElement('h3');
-        diaTitulo.textContent = `Pratos de ${getDiaSemanaTexto(dia)}`;
+          const listaPratos = document.createElement('ul');
 
-        const listaPratos = document.createElement('ul');
+          pratosDoDia.forEach(prato => {
+            const pratoItem = document.createElement('li');
+            pratoItem.className = 'prato-item';
+            pratoItem.innerHTML = `
+              <img src="${prato.imagem}" alt="Imagem do Prato">
+              <p>${prato.prato}</p>
+            `;
 
-        pratosDoDia.forEach(prato => {
-          const pratoItem = document.createElement('li');
-          pratoItem.className = 'prato-item';
-          pratoItem.innerHTML = `
-            <img src="${prato.imagem}" alt="Imagem do Prato">
-            <p>${prato.nome}</p>
-          `;
+            pratoItem.onclick = () => {
+              pratoItem.classList.toggle('selected');
+            };
 
-          // Adicionar funcionalidade de seleção
-          pratoItem.onclick = () => {
-            pratoItem.classList.toggle('selected'); // Alterna a classe "selected"
-          };
+            listaPratos.appendChild(pratoItem);
+          });
 
-          listaPratos.appendChild(pratoItem);
-        });
+          const tabelaDia = document.createElement('div');
+          tabelaDia.appendChild(diaTitulo);
+          tabelaDia.appendChild(listaPratos);
+          pratoContainer.appendChild(tabelaDia);
+        } else {
+          const semPratos = document.createElement('p');
+          semPratos.textContent = `Não há pratos registrados para ${nomeDia}.`;
+          pratoContainer.appendChild(semPratos);
+        }
+      });
 
-        const tabelaDia = document.createElement('div');
-        tabelaDia.appendChild(diaTitulo);
-        tabelaDia.appendChild(listaPratos);
-        pratoContainer.appendChild(tabelaDia);
-      } else {
-        // Caso não haja pratos para o dia
-        const semPratos = document.createElement('p');
-        semPratos.textContent = `Não há pratos registrados para ${getDiaSemanaTexto(dia)}.`;
-        pratoContainer.appendChild(semPratos);
-      }
+      pratoContainer.style.display = 'flex';
+      document.querySelector('.formulario').style.display = 'none';
+      document.getElementById('botoesReserva').style.display = 'flex';
+      document.getElementById('btnMenu').style.display = 'none';
+    })
+    .catch(err => {
+      console.error("Erro ao carregar pratos do Google Sheets:", err);
+      alert("Erro ao carregar pratos. Tente novamente.");
     });
-
-    pratoContainer.style.display = 'flex';
-    document.querySelector('.formulario').style.display = 'none';
-
-    // Mostrar os botões no final da página
-    document.getElementById('botoesReserva').style.display = 'flex';
-    document.getElementById('btnMenu').style.display = 'none';
-
-  } else {
-    alert("Não há pratos registrados para os dias selecionados.");
-  }
 }
 
 function salvarPratosSelecionados() {
@@ -669,10 +664,10 @@ function salvarPratosSelecionados() {
   // Limpar seleção e campos
   document.querySelectorAll('.prato-item.selected').forEach(item => item.classList.remove('selected'));
   document.getElementById('nome').value = '';
-  document.getElementById('botoesReserva').style.display = 'none'; // Esconde os botões após salvar
-  document.getElementById('prato').style.display = 'none'; // Esconde os pratos após salvar
-  document.querySelector('.formulario').style.display = 'block'; // Mostra o formulário novamente
-  document.getElementById('btnMenu').style.display = 'block'; // Mostra o botão de administração novamente
+  document.getElementById('botoesReserva').style.display = 'none';
+  document.getElementById('prato').style.display = 'none';
+  document.querySelector('.formulario').style.display = 'block';
+  document.getElementById('btnMenu').style.display = 'block';
 }
 
 function enviarReservaParaSheets(nome, pratosSelecionados) {
@@ -689,7 +684,6 @@ function enviarReservaParaSheets(nome, pratosSelecionados) {
 
   const imagens = nomesPratos.map(nomePrato => linksImagens[nomePrato] || '');
 
-  // ✅ Mantém o formato que já estava funcionando
   const dadosParaEnviar = {
     cliente: nome,
     pratos: nomesPratos,
@@ -706,21 +700,21 @@ function enviarReservaParaSheets(nome, pratosSelecionados) {
     body: JSON.stringify(dadosParaEnviar)
   });
 
-  // Mostrar as imagens no frontend (confirmar visualmente)
-const container = document.getElementById('imagens-confirmacao');
-if (container) {
-  container.innerHTML = '';
-  imagens.forEach(link => {
-    const img = document.createElement('img');
-    img.src = link;
-    img.style.width = '150px';
-    img.style.margin = '10px';
-    container.appendChild(img);
-  });
-} else {
+  const container = document.getElementById('imagens-confirmacao');
+  if (container) {
+    container.innerHTML = '';
+    imagens.forEach(link => {
+      const img = document.createElement('img');
+      img.src = link;
+      img.style.width = '150px';
+      img.style.margin = '10px';
+      container.appendChild(img);
+    });
+  } else {
     console.warn("Container de imagens não encontrado.");
   }
 }
+
 function carregarPratosRegistrados() {
   fetch("https://script.google.com/macros/s/AKfycbxzDlGuQtoMEv3LfytsqjenAfUlsTDXguLb55ihm6LVOmDWTB9zYoYtyzDpBP0bpbiU/exec")
     .then(response => response.json())
