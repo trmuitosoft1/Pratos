@@ -72,7 +72,7 @@
     }
 
   .footer-text {
-  text-align: center; /* Centraliza os conteúdos */
+  text-align: center; /* Centraliza o conteúdo */
   margin-top: 50px;
   font-size: 14px;
   color: #888;
@@ -735,22 +735,29 @@ function carregarPratosRegistrados() {
           data[dia].forEach(registro => {
             const item = document.createElement('div');
             item.className = 'prato-registrado';
-            item.innerHTML = `
-              <p><strong>${registro.nome}</strong>: ${registro.prato}</p>
-              <img src="${registro.imagem}" alt="${registro.prato}" style="width: 100px;">
-            `;
+
+            const nomePrato = document.createElement('p');
+            nomePrato.innerHTML = `<strong>${registro.nome}</strong>: ${registro.prato}`;
+
+            const imagem = document.createElement('img');
+            imagem.src = registro.imagem;
+            imagem.alt = registro.prato;
+            imagem.style.width = '100px';
+
+            item.appendChild(nomePrato);
+            item.appendChild(imagem);
             container.appendChild(item);
           });
         } else {
-          container.innerHTML = `<p>Não há pratos registrados para ${dia}.</p>`;
+          const msg = document.createElement('p');
+          msg.textContent = `Não há pratos registrados para ${dia}.`;
+          container.appendChild(msg);
         }
       });
     })
     .catch(error => console.error("Erro ao carregar pratos registrados:", error));
 }
-window.onload = () => {
-  carregarPratosRegistrados();
-};
+
 
 // Função auxiliar para obter o nome do dia da semana
 function getDiaSemanaTexto(dia) {
