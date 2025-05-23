@@ -528,7 +528,9 @@
 
 </body>
 <script>
- const scriptURL = "https://script.google.com/macros/s/AKfycbxzDlGuQtoMEv3LfytsqjenAfUlsTDXguLb55ihm6LVOmDWTB9zYoYtyzDpBP0bpbiU/exec";
+
+
+ const scriptURL = "https://script.google.com/macros/s/AKfycbwLAqVv5nr4qgnMHoB46I2uO4mUqreh9mBEGQJz_ncbAaITlOVH9EE0wV7h540oII8B/exec";
   
  let pratosSelecionados = []; // Array para armazenar os pratos selecionados
 
@@ -557,7 +559,7 @@ function submeter() {
     return;
   }
 
-  fetch("https://script.google.com/macros/s/AKfycbxzDlGuQtoMEv3LfytsqjenAfUlsTDXguLb55ihm6LVOmDWTB9zYoYtyzDpBP0bpbiU/exec")
+  fetch("https://script.google.com/macros/s/AKfycbwLAqVv5nr4qgnMHoB46I2uO4mUqreh9mBEGQJz_ncbAaITlOVH9EE0wV7h540oII8B/exec")
     .then(res => res.json())
     .then(data => {
       const pratoContainer = document.getElementById('prato');
@@ -654,11 +656,7 @@ function salvarPratosSelecionados() {
 
   alert(`Reserva concluída!\nCliente: ${nomeCliente}\nPratos Reservados:\n${pratosMsg}`);
 
-  // Salva no localStorage
-  const reservas = JSON.parse(localStorage.getItem('reservas')) || [];
-  reservas.push({ cliente: nomeCliente, pratos: pratosSelecionados });
-  localStorage.setItem('reservas', JSON.stringify(reservas));
-
+  // Envia diretamente para o Google Sheets
   enviarReservaParaSheets(nomeCliente, pratosSelecionados);
 
   // Limpar seleção e campos
@@ -684,6 +682,7 @@ function enviarReservaParaSheets(nome, pratosSelecionados) {
 
   const imagens = nomesPratos.map(nomePrato => linksImagens[nomePrato] || '');
 
+  // ✅ Mantém o formato que já estava funcionando
   const dadosParaEnviar = {
     cliente: nome,
     pratos: nomesPratos,
@@ -691,7 +690,7 @@ function enviarReservaParaSheets(nome, pratosSelecionados) {
     imagens: imagens
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbxzDlGuQtoMEv3LfytsqjenAfUlsTDXguLb55ihm6LVOmDWTB9zYoYtyzDpBP0bpbiU/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbwLAqVv5nr4qgnMHoB46I2uO4mUqreh9mBEGQJz_ncbAaITlOVH9EE0wV7h540oII8B/exec", {
     method: "POST",
     mode: "no-cors",
     headers: {
@@ -700,23 +699,23 @@ function enviarReservaParaSheets(nome, pratosSelecionados) {
     body: JSON.stringify(dadosParaEnviar)
   });
 
-  const container = document.getElementById('imagens-confirmacao');
-  if (container) {
-    container.innerHTML = '';
-    imagens.forEach(link => {
-      const img = document.createElement('img');
-      img.src = link;
-      img.style.width = '150px';
-      img.style.margin = '10px';
-      container.appendChild(img);
-    });
-  } else {
+  // Mostrar as imagens no frontend (confirmar visualmente)
+const container = document.getElementById('imagens-confirmacao');
+if (container) {
+  container.innerHTML = '';
+  imagens.forEach(link => {
+    const img = document.createElement('img');
+    img.src = link;
+    img.style.width = '150px';
+    img.style.margin = '10px';
+    container.appendChild(img);
+  });
+} else {
     console.warn("Container de imagens não encontrado.");
   }
 }
-
 function carregarPratosRegistrados() {
-  fetch("https://script.google.com/macros/s/AKfycbxzDlGuQtoMEv3LfytsqjenAfUlsTDXguLb55ihm6LVOmDWTB9zYoYtyzDpBP0bpbiU/exec")
+  fetch("https://script.google.com/macros/s/AKfycbwLAqVv5nr4qgnMHoB46I2uO4mUqreh9mBEGQJz_ncbAaITlOVH9EE0wV7h540oII8B/exec")
     .then(response => response.json())
     .then(data => {
       const dias = ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira"];
@@ -729,41 +728,28 @@ function carregarPratosRegistrados() {
           data[dia].forEach(registro => {
             const item = document.createElement('div');
             item.className = 'prato-registrado';
-
-            const nomePrato = document.createElement('p');
-            nomePrato.innerHTML = `<strong>${registro.nome}</strong>: ${registro.prato}`;
-
-            const imagem = document.createElement('img');
-            imagem.src = registro.imagem;
-            imagem.alt = registro.prato;
-            imagem.style.width = '100px';
-
-            item.appendChild(nomePrato);
-            item.appendChild(imagem);
+            item.innerHTML = `
+              <p><strong>${registro.nome}</strong>: ${registro.prato}</p>
+              <img src="${registro.imagem}" alt="${registro.prato}" style="width: 100px;">
+            `;
             container.appendChild(item);
           });
         } else {
-          const msg = document.createElement('p');
-          msg.textContent = `Não há pratos registrados para ${dia}.`;
-          container.appendChild(msg);
+          container.innerHTML = `<p>Não há pratos registrados para ${dia}.</p>`;
         }
       });
     })
     .catch(error => console.error("Erro ao carregar pratos registrados:", error));
 }
+window.onload = () => {
+  carregarPratosRegistrados();
+};
 
-
-// Função auxiliar para obter o nome do dia da semana
-function getDiaSemanaTexto(dia) {
-  const dias = {
-    1: 'Segunda-feira',
-    2: 'Terça-feira',
-    3: 'Quarta-feira',
-    4: 'Quinta-feira',
-    5: 'Sexta-feira'
-  };
-  return dias[dia] || 'Dia desconhecido';
+function getDiaSemanaTexto(numero) {
+  const dias = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira'];
+  return dias[numero - 1];
 }
+
 
   function mostrarLogin() {
     document.getElementById('titulo').style.display = 'none';
@@ -810,7 +796,6 @@ function guardarPrato() {
   const nomeInput = document.querySelector('.novoNome');
   const diaSelect = document.querySelector('#diaSemanaAdmin'); // Mantém o dia selecionado
 
-  // Verificar se todos os campos estão preenchidos
   if (!fileInput || !fileInput.files[0] || !nomeInput || !nomeInput.value.trim() || !diaSelect || !diaSelect.value) {
     alert("Preencha todos os campos antes de guardar!");
     return;
@@ -820,32 +805,33 @@ function guardarPrato() {
   reader.onload = function (event) {
     const base64Image = event.target.result;
 
-    // Obter os pratos existentes no localStorage
-    const pratos = JSON.parse(localStorage.getItem('pratos')) || [];
-
-    // Adicionar o novo prato
-    pratos.push({
+    // Montar objeto para enviar para backend
+    const novoPrato = {
       nome: nomeInput.value.trim(),
       imagem: base64Image,
       diaSemana: diaSelect.value
+    };
+
+    // Enviar para Google Apps Script (substitua pela sua URL)
+    fetch("https://script.google.com/macros/s/AKfycbwLAqVv5nr4qgnMHoB46I2uO4mUqreh9mBEGQJz_ncbAaITlOVH9EE0wV7h540oII8B/exec", {
+      method: "POST",
+      mode: "no-cors", // para evitar erro CORS, mesmo que não haja resposta
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({acao: 'guardarPrato', prato: novoPrato})
+    }).then(() => {
+      alert('Prato guardado com sucesso no servidor!');
+      // Limpar campos e localStorage opcionalmente
+      nomeInput.value = '';
+      diaSelect.value = '';
+      const novoFileInput = fileInput.cloneNode(true);
+      fileInput.parentNode.replaceChild(novoFileInput, fileInput);
+      // Atualizar a lista no frontend, se quiser
+      carregarPratosRegistrados();
+    }).catch(() => {
+      alert('Erro ao guardar prato no servidor.');
     });
-
-    // Salvar os pratos no localStorage
-    localStorage.setItem('pratos', JSON.stringify(pratos));
-
-    // Exibir os pratos salvos
-    exibirPratos();
-
-    // Limpar campos do formulário
-    nomeInput.value = '';
-    diaSelect.value = '';
-
-    // Recriar o campo de upload de arquivo para limpá-lo
-    const novoFileInput = fileInput.cloneNode(true);
-    fileInput.parentNode.replaceChild(novoFileInput, fileInput);
- 
-    // Exibir mensagem de sucesso
-    alert('Pratos guardados com sucesso!');
   };
 
   reader.onerror = function () {
@@ -1005,7 +991,7 @@ function saveToSheet(name, imageBase64, day) {
     values: values
   };
 
-  const url = `https://script.google.com/macros/s/AKfycbwhMQ6C2whb_upCTblg93XKoO2thdKnTHGSqAKsuJrUhk0JwFHOjjGwkHrn1G1f_KH7/exec`;
+  const url = `https://script.google.com/macros/s/AKfycbyEAGMvU2Bb7BnFNd2hRPj_5Qdlmz7pVrsjY9EYLBjvkk7Suwo17AK1nut4UcwVMww/exec`;
 
   fetch(url, {
     method: 'PUT',
@@ -1130,13 +1116,7 @@ function ativarPrato(prato) {
     function voltar() {
       window.history.back(); // Volta para a página anterior
     }
-const urlParams = new URLSearchParams(window.location.search);
-const prato = {
-  nome: urlParams.get("nome"),
-  dia: urlParams.get("dia"),
-  imagem: urlParams.get("imagem")
-};
-    pratos.forEach(prato => {
+pratos.forEach(prato => {
   const container = document.getElementById(prato.dia);
   if (container) {
     const img = document.createElement('img');
