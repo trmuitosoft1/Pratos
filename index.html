@@ -3,19 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <title>Redirecionando...</title>
-    <meta http-equiv="refresh" content="0;url=segunda.html" />
     <script>
-      // Inicializa os pratos no localStorage, se ainda não existirem
-      if (!localStorage.getItem('pratos')) {
-        const pratosDaSemana = [
-          { nome: "Bacalhau", imagem: "Imagens/bacalhau.png", diaSemana: 1, oculto: false },
-          { nome: "Bitoque", imagem: "Imagens/bitoque.png", diaSemana: 1, oculto: false },
-          { nome: "Cozido", imagem: "Imagens/cozido.png", diaSemana: 2, oculto: false },
-          { nome: "Lasanha", imagem: "Imagens/lasanha.png", diaSemana: 2, oculto: false },
-          { nome: "Frango", imagem: "Imagens/frango.png", diaSemana: 3, oculto: false }
-        ];
-        localStorage.setItem('pratos', JSON.stringify(pratosDaSemana));
-      }
+      document.addEventListener("DOMContentLoaded", () => {
+        if (!localStorage.getItem('pratos')) {
+          const pratosDaSemana = [
+            { nome: "Bacalhau", imagem: "Imagens/bacalhau.png", diaSemana: 1, oculto: false },
+            { nome: "Bitoque", imagem: "Imagens/bitoque.png", diaSemana: 1, oculto: false },
+            { nome: "Cozido", imagem: "Imagens/cozido.png", diaSemana: 2, oculto: false },
+            { nome: "Lasanha", imagem: "Imagens/lasanha.png", diaSemana: 2, oculto: false },
+            { nome: "Frango", imagem: "Imagens/frango.png", diaSemana: 3, oculto: false }
+          ];
+          localStorage.setItem('pratos', JSON.stringify(pratosDaSemana));
+        }
+
+        // ✅ Redireciona só após salvar
+        window.location.href = "segunda.html";
+      });
     </script>
   </head>
   <body>
