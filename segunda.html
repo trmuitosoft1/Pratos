@@ -528,6 +528,15 @@
 
 </body>
 <script>
+ const linksImagens = {
+  "bacalhau": "https://trmuitosoft1.github.io/Pratos/Imagens/bacalhau.png",
+  "bitoque": "https://trmuitosoft1.github.io/Pratos/Imagens/bitoque.png",
+  "cozido": "https://trmuitosoft1.github.io/Pratos/Imagens/cozido.png",
+  "frango": "https://trmuitosoft1.github.io/Pratos/Imagens/frango.png",
+  "lasanha": "https://trmuitosoft1.github.io/Pratos/Imagens/lasanha.png"
+};
+
+ 
  const scriptURL = "https://script.google.com/macros/s/AKfycbxzDlGuQtoMEv3LfytsqjenAfUlsTDXguLb55ihm6LVOmDWTB9zYoYtyzDpBP0bpbiU/exec";
   
  let pratosSelecionados = []; // Array para armazenar os pratos selecionados
@@ -575,21 +584,23 @@ function submeter() {
 
         const listaPratos = document.createElement('ul');
 
-        pratosDoDia.forEach(prato => {
-          const pratoItem = document.createElement('li');
-          pratoItem.className = 'prato-item';
-          pratoItem.innerHTML = `
-            <img src="${prato.imagem}" alt="Imagem do Prato">
-            <p>${prato.nome}</p>
-          `;
-
-          // Adicionar funcionalidade de seleção
-          pratoItem.onclick = () => {
-            pratoItem.classList.toggle('selected'); // Alterna a classe "selected"
-          };
-
-          listaPratos.appendChild(pratoItem);
-        });
+ pratosDoDia.forEach(prato => {
+  const pratoItem = document.createElement('li');
+  pratoItem.className = 'prato-item';
+  // Usa o link do GitHub se existir, senão usa o que está guardado
+  // Corrige para aceitar nomes com maiúsculas/minúsculas diferentes
+  const nomeKey = prato.nome.trim().toLowerCase();
+  const imagemSrc = linksImagens[nomeKey] || prato.imagem;
+  pratoItem.innerHTML = `
+    <img src="${imagemSrc}" alt="Imagem do Prato">
+    <p>${prato.nome}</p>
+  `;
+  // Adicionar funcionalidade de seleção
+  pratoItem.onclick = () => {
+    pratoItem.classList.toggle('selected');
+  };
+  listaPratos.appendChild(pratoItem);
+});
 
         const tabelaDia = document.createElement('div');
         tabelaDia.appendChild(diaTitulo);
