@@ -527,29 +527,8 @@
 </div>
 
 </body>
-
 <script>
- // Adicione logo antes do seu código principal <script>
-if (!localStorage.getItem('pratos')) {
-  const pratosPadrao = [
-    { nome: "Bacalhau", imagem: "https://trmuitosoft1.github.io/Pratos/Imagens/bacalhau.png", diaSemana: "1" },
-    { nome: "Bitoque", imagem: "https://trmuitosoft1.github.io/Pratos/Imagens/bitoque.png", diaSemana: "2" },
-    { nome: "Cozido", imagem: "https://trmuitosoft1.github.io/Pratos/Imagens/cozido.png", diaSemana: "3" },
-    { nome: "Frango", imagem: "https://trmuitosoft1.github.io/Pratos/Imagens/frango.png", diaSemana: "4" },
-    { nome: "Lasanha", imagem: "https://trmuitosoft1.github.io/Pratos/Imagens/lasanha.png", diaSemana: "5" }
-  ];
-  localStorage.setItem('pratos', JSON.stringify(pratosPadrao));
-}
- const linksImagens = {
-  "bacalhau": "https://trmuitosoft1.github.io/Pratos/Imagens/bacalhau.png",
-  "bitoque": "https://trmuitosoft1.github.io/Pratos/Imagens/bitoque.png",
-  "cozido": "https://trmuitosoft1.github.io/Pratos/Imagens/cozido.png",
-  "frango": "https://trmuitosoft1.github.io/Pratos/Imagens/frango.png",
-  "lasanha": "https://trmuitosoft1.github.io/Pratos/Imagens/lasanha.png"
-};
-
- 
- const scriptURL = "https://script.google.com/macros/s/AKfycbwbEWKTxFkGstevsx2n986X7RSIkqA8iTKD2rWqSCcs1p5mYmv89R1d5Esy7UJzEyJh/exec";
+ const scriptURL = "https://script.google.com/macros/s/AKfycbw_0_phLGuv4sX5D2i1lmBafFm0LtThiBVz46g579-bDbasub_z-hIE0K5RWYL9iXG_/exec";
   
  let pratosSelecionados = []; // Array para armazenar os pratos selecionados
 
@@ -569,6 +548,11 @@ if (!localStorage.getItem('pratos')) {
   // Mostrar a tela de administração
   document.getElementById('opcoesAdmin').style.display = 'block';
 }
+let pratosGlobais = []; // array global
+
+window.onload = function() {
+  carregarPratosRegistrados();
+};
 
 function submeter() {
   const nome = document.getElementById('nome').value.trim();
@@ -579,91 +563,77 @@ function submeter() {
     return;
   }
 
-  // Busca os pratos do Google Sheets
-  fetch("https://script.google.com/macros/s/AKfycbwbEWKTxFkGstevsx2n986X7RSIkqA8iTKD2rWqSCcs1p5mYmv89R1d5Esy7UJzEyJh/exec?modo=ler")
-    .then(response => response.json())
-    .then(pratosSheets => {
-      // Busca os pratos do localStorage
-      const pratosLocal = JSON.parse(localStorage.getItem('pratos')) || [];
-      // Junta os dois arrays
-      const pratos = [...pratosSheets, ...pratosLocal];
+  // Obter os pratos do localStorage
+const pratos = JSON.parse(localStorage.getItem('pratos')) || [];
 
-      const pratoContainer = document.getElementById('prato');
-      pratoContainer.innerHTML = '';
+  const pratoContainer = document.getElementById('prato');
+  pratoContainer.innerHTML = ''; // Limpa o conteúdo anterior
 
-      diasSemana.forEach(dia => {
-        // Filtra os pratos do dia
-        const pratosDoDia = pratos.filter(prato => parseInt(prato.diaSemana) === dia && !prato.oculto);
+  if (diasSemana.length > 0) {
+    diasSemana.forEach(dia => {
+      // Filtrar os pratos para o dia atual, ignorando os ocultos
+      const pratosDoDia = pratos.filter(prato => parseInt(prato.diaSemana) === dia && !prato.oculto);
 
-        if (pratosDoDia.length > 0) {
-          const diaTitulo = document.createElement('h3');
-          diaTitulo.textContent = `Pratos de ${getDiaSemanaTexto(dia)}`;
+      if (pratosDoDia.length > 0) {
+        // Criar uma seção para o dia
+        const diaTitulo = document.createElement('h3');
+        diaTitulo.textContent = `Pratos de ${getDiaSemanaTexto(dia)}`;
 
-          const listaPratos = document.createElement('ul');
+        const listaPratos = document.createElement('ul');
 
-          pratosDoDia.forEach(prato => {
-            const pratoItem = document.createElement('li');
-            pratoItem.className = 'prato-item';
-            pratoItem.innerHTML = `
-              <img src="${prato.imagem}" alt="Imagem do Prato">
-              <p>${prato.nome}</p>
-            `;
-            pratoItem.onclick = () => {
-              pratoItem.classList.toggle('selected');
-            };
-            listaPratos.appendChild(pratoItem);
-          });
+        pratosDoDia.forEach(prato => {
+          const pratoItem = document.createElement('li');
+          pratoItem.className = 'prato-item';
+          pratoItem.innerHTML = `
+            <img src="${prato.imagem}" alt="Imagem do Prato">
+            <p>${prato.nome}</p>
+          `;
 
-          const tabelaDia = document.createElement('div');
-          tabelaDia.appendChild(diaTitulo);
-          tabelaDia.appendChild(listaPratos);
-          pratoContainer.appendChild(tabelaDia);
-        } else {
-          const semPratos = document.createElement('p');
-          semPratos.textContent = `Não há pratos registrados para ${getDiaSemanaTexto(dia)}.`;
-          pratoContainer.appendChild(semPratos);
-        }
-      });
+          // Adicionar funcionalidade de seleção
+          pratoItem.onclick = () => {
+            pratoItem.classList.toggle('selected'); // Alterna a classe "selected"
+          };
 
-      pratoContainer.style.display = 'flex';
-      document.querySelector('.formulario').style.display = 'none';
-      document.getElementById('botoesReserva').style.display = 'flex';
-      document.getElementById('btnMenu').style.display = 'none';
-    })
-    .catch(error => {
-      alert("Erro ao buscar pratos do servidor.");
-      console.error(error);
+          listaPratos.appendChild(pratoItem);
+        });
+
+        const tabelaDia = document.createElement('div');
+        tabelaDia.appendChild(diaTitulo);
+        tabelaDia.appendChild(listaPratos);
+        pratoContainer.appendChild(tabelaDia);
+      } else {
+        // Caso não haja pratos para o dia
+        const semPratos = document.createElement('p');
+        semPratos.textContent = `Não há pratos registrados para ${getDiaSemanaTexto(dia)}.`;
+        pratoContainer.appendChild(semPratos);
+      }
     });
-}
-function adicionarPrato(nomeCliente, nomePrato, diaSemana) {
-  const folha = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
-  const linksImagens = {
-    "bacalhau": "https://trmuitosoft1.github.io/Pratos/Imagens/bacalhau.png",
-    "bitoque": "https://trmuitosoft1.github.io/Pratos/Imagens/bitoque.png",
-    "cozido": "https://trmuitosoft1.github.io/Pratos/Imagens/cozido.png",
-    "frango": "https://trmuitosoft1.github.io/Pratos/Imagens/frango.png",
-    "lasanha": "https://trmuitosoft1.github.io/Pratos/Imagens/lasanha.png"
-  };
-  const nomePratoLower = (nomePrato || "").toString().trim().toLowerCase();
-  const linkImagem = linksImagens[nomePratoLower] || "";
 
-  folha.appendRow([nomeCliente, nomePrato, diaSemana, linkImagem]);
+    pratoContainer.style.display = 'flex';
+    document.querySelector('.formulario').style.display = 'none';
+
+    // Mostrar os botões no final da página
+    document.getElementById('botoesReserva').style.display = 'flex';
+    document.getElementById('btnMenu').style.display = 'none';
+
+  } else {
+    alert("Não há pratos registrados para os dias selecionados.");
+  }
 }
+
 function salvarPratosSelecionados() {
   const nomeCliente = document.getElementById('nome').value.trim();
   const pratosSelecionados = [];
   document.querySelectorAll('.prato-item.selected').forEach(item => {
-    const nomePrato = item.querySelector('p').textContent;
+    const nomePrato = item.querySelector('p') ? item.querySelector('p').textContent : '';
     let dia = 'Desconhecido';
-    let parent = item.parentElement;
-    while (parent && parent.tagName !== 'DIV') {
-      parent = parent.parentElement;
-    }
-    if (parent) {
-      const h3 = parent.querySelector('h3');
-      if (h3) {
-        dia = h3.textContent.replace('Pratos de ', '');
+    let el = item;
+    while (el && el !== document.body) {
+      if (el.previousElementSibling && el.previousElementSibling.tagName === 'H3') {
+        dia = el.previousElementSibling.textContent.replace('Pratos de ', '');
+        break;
       }
+      el = el.parentElement;
     }
     pratosSelecionados.push({ dia, nome: nomePrato });
   });
@@ -678,104 +648,107 @@ function salvarPratosSelecionados() {
     return;
   }
 
-  // Agrupa os pratos por dia para a mensagem
-  const pratosPorDia = {};
-  pratosSelecionados.forEach(p => {
-    if (!pratosPorDia[p.dia]) {
-      pratosPorDia[p.dia] = [];
+  // Filtra pratos incompletos
+  const dadosParaEnviar = pratosSelecionados
+    .filter(p => p.nome && p.dia && p.dia !== 'Desconhecido')
+    .map(p => ({
+      nome: nomeCliente,
+      prato: p.nome,
+      diaSemana: p.dia
+    }));
+
+  if (dadosParaEnviar.length === 0) {
+    alert('Erro: Os dados da reserva estão incompletos.');
+    return;
+  }
+
+  console.log("A enviar para Sheets:", dadosParaEnviar);
+
+  fetch("https://script.google.com/macros/s/AKfycbw_0_phLGuv4sX5D2i1lmBafFm0LtThiBVz46g579-bDbasub_z-hIE0K5RWYL9iXG_/exec", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dadosParaEnviar)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      alert("Reserva enviada com sucesso!");
+    } else {
+      alert("Erro ao enviar reserva: " + (data.message || JSON.stringify(data)));
     }
-    pratosPorDia[p.dia].push(p.nome);
+  })
+  .catch(err => {
+    alert("Falha ao enviar reserva: " + err);
   });
-
-  const pratosMsg = Object.entries(pratosPorDia)
-    .map(([dia, pratos]) => `${dia}: ${pratos.join(', ')}`)
-    .join('\n');
-
-  alert(`Reserva concluída!\nCliente: ${nomeCliente}\nPratos Reservados:\n${pratosMsg}`);
-
-  // Salva no localStorage
-  const reservas = JSON.parse(localStorage.getItem('reservas')) || [];
-  reservas.push({ cliente: nomeCliente, pratos: pratosSelecionados });
-  localStorage.setItem('reservas', JSON.stringify(reservas));
-
-  enviarReservaParaSheets(nomeCliente, pratosSelecionados);
 
   // Limpar seleção e campos
   document.querySelectorAll('.prato-item.selected').forEach(item => item.classList.remove('selected'));
   document.getElementById('nome').value = '';
-  document.getElementById('botoesReserva').style.display = 'none'; // Esconde os botões após salvar
-  document.getElementById('prato').style.display = 'none'; // Esconde os pratos após salvar
-  document.querySelector('.formulario').style.display = 'block'; // Mostra o formulário novamente
-  document.getElementById('btnMenu').style.display = 'block'; // Mostra o botão de administração novamente
+  document.getElementById('botoesReserva').style.display = 'none';
+  document.getElementById('prato').style.display = 'none';
+  document.querySelector('.formulario').style.display = 'block';
+  document.getElementById('btnMenu').style.display = 'block';
 }
-
 function enviarReservaParaSheets(nome, pratosSelecionados) {
-  const nomesPratos = pratosSelecionados.map(p => p.nome);
-  const dias = pratosSelecionados.map(p => p.dia);
+  const dadosParaEnviar = pratosSelecionados.map(p => ({
+    nome: nome,
+    prato: p.nome,
+    diaSemana: p.dia
+  }));
+  console.log("A enviar para Sheets:", dadosParaEnviar); // <-- debug
 
-  const linksImagens = {
-    "Bacalhau": "https://trmuitosoft1.github.io/Pratos/Imagens/bacalhau.png",
-    "Bitoque": "https://trmuitosoft1.github.io/Pratos/Imagens/bitoque.png",
-    "Cozido": "https://trmuitosoft1.github.io/Pratos/Imagens/cozido.png",
-    "Frango": "https://trmuitosoft1.github.io/Pratos/Imagens/frango.png",
-    "Lasanha": "https://trmuitosoft1.github.io/Pratos/Imagens/lasanha.png"
-  };
-
-  const imagens = nomesPratos.map(nomePrato => linksImagens[nomePrato] || '');
-
-  // ✅ Mantém o formato que já estava funcionando
-  const dadosParaEnviar = {
-    cliente: nome,
-    pratos: nomesPratos,
-    dias: dias,
-    imagens: imagens
-  };
-
-  fetch("https://script.google.com/macros/s/AKfycbwbEWKTxFkGstevsx2n986X7RSIkqA8iTKD2rWqSCcs1p5mYmv89R1d5Esy7UJzEyJh/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbw_0_phLGuv4sX5D2i1lmBafFm0LtThiBVz46g579-bDbasub_z-hIE0K5RWYL9iXG_/exec", {
     method: "POST",
-    mode: "no-cors",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(dadosParaEnviar)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      console.log("✔️ Reserva enviada com sucesso");
+    } else {
+      console.error("❌ Erro do Apps Script:", data.message || data);
+    }
+  })
+  .catch(err => {
+    console.error("❌ Falha ao enviar reserva:", err);
   });
-
-  // Mostrar as imagens no frontend (confirmar visualmente)
-const container = document.getElementById('imagens-confirmacao');
-if (container) {
-  container.innerHTML = '';
-  imagens.forEach(link => {
-    const img = document.createElement('img');
-    img.src = link;
-    img.style.width = '150px';
-    img.style.margin = '10px';
-    container.appendChild(img);
-  });
-} else {
-    console.warn("Container de imagens não encontrado.");
-  }
 }
 function carregarPratosRegistrados() {
-  fetch("https://script.google.com/macros/s/AKfycbwbEWKTxFkGstevsx2n986X7RSIkqA8iTKD2rWqSCcs1p5mYmv89R1d5Esy7UJzEyJh/exec")
+  const container = document.getElementById('prato'); // ou outro elemento certo no seu HTML
+  container.innerHTML = ''; // limpa antes
+
+  fetch("https://script.google.com/macros/s/AKfycbw_0_phLGuv4sX5D2i1lmBafFm0LtThiBVz46g579-bDbasub_z-hIE0K5RWYL9iXG_/exec")
     .then(response => response.json())
     .then(data => {
+      pratosGlobais = []; // limpa a lista global
       const dias = ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira"];
 
       dias.forEach(dia => {
-        const container = document.getElementById(`pratos-${dia.toLowerCase().replace('-feira', '')}`);
-        container.innerHTML = '';
+        const registros = data[dia] || [];
 
-        if (data[dia] && data[dia].length > 0) {
-          data[dia].forEach(registro => {
+        if (registros.length > 0) {
+          const diaTitulo = document.createElement('h3');
+          diaTitulo.textContent = `Pratos de ${dia}`;
+          container.appendChild(diaTitulo);
+
+         registros.forEach(registro => {
+         pratosGlobais.push({
+         nome: registro.prato, 
+         imagem: registro.imagem || '',
+         diaSemana: dia,
+         oculto: false
+                        });
+
             const item = document.createElement('div');
             item.className = 'prato-registrado';
 
             const nomePrato = document.createElement('p');
-            nomePrato.innerHTML = `<strong>${registro.nome}</strong>: ${registro.prato}`;
+            nomePrato.innerHTML = `<strong>${registro.nome}</strong>`;
 
             const imagem = document.createElement('img');
-            imagem.src = registro.imagem;
-            imagem.alt = registro.prato;
+            imagem.src = registro.imagem || '';
+            imagem.alt = registro.nome;
             imagem.style.width = '100px';
 
             item.appendChild(nomePrato);
@@ -791,8 +764,6 @@ function carregarPratosRegistrados() {
     })
     .catch(error => console.error("Erro ao carregar pratos registrados:", error));
 }
-
-
 // Função auxiliar para obter o nome do dia da semana
 function getDiaSemanaTexto(dia) {
   const dias = {
@@ -846,40 +817,53 @@ function exibirPratos() {
   }
 
 function guardarPrato() {
-  const entradas = document.querySelectorAll('.entrada-prato');
-  let algumPreenchido = false;
+  const fileInput = document.querySelector('.novaImagem');
+  const nomeInput = document.querySelector('.novoNome');
+  const diaSelect = document.querySelector('#diaSemanaAdmin'); // Mantém o dia selecionado
 
-  entradas.forEach(entrada => {
-    const fileInput = entrada.querySelector('.novaImagem');
-    const nomeInput = entrada.querySelector('.novoNome');
-    const diaSelect = entrada.querySelector('.diaSemana, #diaSemanaAdmin');
-
-    if (fileInput && fileInput.files[0] && nomeInput && nomeInput.value.trim() && diaSelect && diaSelect.value) {
-      algumPreenchido = true;
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        const base64Image = event.target.result;
-
-        // Salva no localStorage
-        let pratos = JSON.parse(localStorage.getItem('pratos')) || [];
-        pratos.push({
-          nome: nomeInput.value.trim(),
-          imagem: base64Image,
-          diaSemana: diaSelect.value
-        });
-        localStorage.setItem('pratos', JSON.stringify(pratos));
-
-        alert('Prato guardado com sucesso!');
-        submeter();
-      };
-      reader.readAsDataURL(fileInput.files[0]);
-    }
-  });
-
-  if (!algumPreenchido) {
+  // Verificar se todos os campos estão preenchidos
+  if (!fileInput || !fileInput.files[0] || !nomeInput || !nomeInput.value.trim() || !diaSelect || !diaSelect.value) {
     alert("Preencha todos os campos antes de guardar!");
     return;
   }
+
+  const reader = new FileReader();
+  reader.onload = function (event) {
+    const base64Image = event.target.result;
+
+    // Obter os pratos existentes no localStorage
+    const pratos = JSON.parse(localStorage.getItem('pratos')) || [];
+
+    // Adicionar o novo prato
+    pratos.push({
+      nome: nomeInput.value.trim(),
+      imagem: base64Image,
+      diaSemana: diaSelect.value
+    });
+
+    // Salvar os pratos no localStorage
+    localStorage.setItem('pratos', JSON.stringify(pratos));
+
+    // Exibir os pratos salvos
+    exibirPratos();
+
+    // Limpar campos do formulário
+    nomeInput.value = '';
+    diaSelect.value = '';
+
+    // Recriar o campo de upload de arquivo para limpá-lo
+    const novoFileInput = fileInput.cloneNode(true);
+    fileInput.parentNode.replaceChild(novoFileInput, fileInput);
+ 
+    // Exibir mensagem de sucesso
+    alert('Pratos guardados com sucesso!');
+  };
+
+  reader.onerror = function () {
+    alert("Erro ao processar a imagem. Tente novamente.");
+  };
+
+  reader.readAsDataURL(fileInput.files[0]);
 }
 function desativarPrato(legenda) {
   const dados = {
@@ -904,7 +888,7 @@ function desativarPrato(legenda) {
       console.error(err);
     });
 }
-fetch("https://script.google.com/macros/s/AKfycbwbEWKTxFkGstevsx2n986X7RSIkqA8iTKD2rWqSCcs1p5mYmv89R1d5Esy7UJzEyJh/exec?modo=ler")
+fetch("https://script.google.com/macros/s/AKfycbw_0_phLGuv4sX5D2i1lmBafFm0LtThiBVz46g579-bDbasub_z-hIE0K5RWYL9iXG_/exec?modo=ler")
   .then(response => response.json())
   .then(data => {
     if (data && Array.isArray(data)) {
@@ -1032,7 +1016,7 @@ function saveToSheet(name, imageBase64, day) {
     values: values
   };
 
-  const url = `https://script.google.com/macros/s/AKfycbwbEWKTxFkGstevsx2n986X7RSIkqA8iTKD2rWqSCcs1p5mYmv89R1d5Esy7UJzEyJh/exec`;
+  const url = `https://script.google.com/macros/s/AKfycbw_0_phLGuv4sX5D2i1lmBafFm0LtThiBVz46g579-bDbasub_z-hIE0K5RWYL9iXG_/exec`;
 
   fetch(url, {
     method: 'PUT',
