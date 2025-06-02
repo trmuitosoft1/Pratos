@@ -528,7 +528,7 @@
 
 </body>
 <script>
- const scriptURL = "https://script.google.com/macros/s/AKfycbzQx72k4Ud5h-21encCt1goUc9ZBwYMXK4Gg_icO-KJ_GEsc2oQT3O58UGz_UaNqhld/exec";
+ const scriptURL = "https://script.google.com/macros/s/AKfycbybeDzXilSACoYIrL4yA9jspAKYZlx_QkOqTby2KvpcpJGkRcRXRyelefzZkllYAcY/exec";
   
  let pratosSelecionados = []; // Array para armazenar os pratos selecionados
 
@@ -688,9 +688,9 @@ function enviarReservaParaSheets(nome, pratosSelecionados) {
     diaSemana: p.dia
   }));
 
-fetch("https://script.google.com/macros/s/AKfycbzQx72k4Ud5h-21encCt1goUc9ZBwYMXK4Gg_icO-KJ_GEsc2oQT3O58UGz_UaNqhld/exec", {
+fetch("https://script.google.com/macros/s/AKfycbybeDzXilSACoYIrL4yA9jspAKYZlx_QkOqTby2KvpcpJGkRcRXRyelefzZkllYAcY/exec", {
   method: "POST",
-  mode: "no-cors", // <- IMPORTANTE PARA FUNCIONAR COM Apps Script
+
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify(dadosParaEnviar)
 })
@@ -705,7 +705,7 @@ function carregarPratosRegistrados() {
   const container = document.getElementById('prato'); // ou outro elemento certo no seu HTML
   container.innerHTML = ''; // limpa antes
 
-  fetch("https://script.google.com/macros/s/AKfycbzQx72k4Ud5h-21encCt1goUc9ZBwYMXK4Gg_icO-KJ_GEsc2oQT3O58UGz_UaNqhld/exec")
+  fetch("https://script.google.com/macros/s/AKfycbybeDzXilSACoYIrL4yA9jspAKYZlx_QkOqTby2KvpcpJGkRcRXRyelefzZkllYAcY/exec")
     .then(response => response.json())
     .then(data => {
       pratosGlobais = []; // limpa a lista global
@@ -878,7 +878,7 @@ function desativarPrato(legenda) {
       console.error(err);
     });
 }
-fetch("https://script.google.com/macros/s/AKfycbzQx72k4Ud5h-21encCt1goUc9ZBwYMXK4Gg_icO-KJ_GEsc2oQT3O58UGz_UaNqhld/exec?modo=ler")
+fetch("https://script.google.com/macros/s/AKfycbybeDzXilSACoYIrL4yA9jspAKYZlx_QkOqTby2KvpcpJGkRcRXRyelefzZkllYAcY/exec?modo=ler")
   .then(response => response.json())
   .then(data => {
     if (data && Array.isArray(data)) {
@@ -1006,7 +1006,7 @@ function saveToSheet(name, imageBase64, day) {
     values: values
   };
 
-  const url = `https://script.google.com/macros/s/AKfycbzQx72k4Ud5h-21encCt1goUc9ZBwYMXK4Gg_icO-KJ_GEsc2oQT3O58UGz_UaNqhld/exec`;
+  const url = `https://script.google.com/macros/s/AKfycbybeDzXilSACoYIrL4yA9jspAKYZlx_QkOqTby2KvpcpJGkRcRXRyelefzZkllYAcY/exec`;
 
   fetch(url, {
     method: 'PUT',
