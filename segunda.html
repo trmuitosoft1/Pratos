@@ -688,24 +688,18 @@ function enviarReservaParaSheets(nome, pratosSelecionados) {
     diaSemana: p.dia
   }));
 
-  fetch("https://script.google.com/macros/s/AKfycbzQx72k4Ud5h-21encCt1goUc9ZBwYMXK4Gg_icO-KJ_GEsc2oQT3O58UGz_UaNqhld/exec", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(dadosParaEnviar),
-
-  })
-  .then(res => res.json())
-  .then(data => {
-    console.log("Resposta do Apps Script:", data);
-    if (data.status === "success") {
-      console.log("✔️ Reserva enviada com sucesso");
-    } else {
-      console.error("❌ Erro do Apps Script:", data.message || data);
-    }
-  })
-  .catch(err => {
-    console.error("❌ Falha ao enviar reserva:", err);
-  });
+fetch("https://script.google.com/macros/s/AKfycbzQx72k4Ud5h-21encCt1goUc9ZBwYMXK4Gg_icO-KJ_GEsc2oQT3O58UGz_UaNqhld/exec", {
+  method: "POST",
+  mode: "no-cors", // <- IMPORTANTE PARA FUNCIONAR COM Apps Script
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(dadosParaEnviar)
+})
+.then(() => {
+  console.log("✔️ Reserva enviada com sucesso");
+})
+.catch(err => {
+  console.error("❌ Falha ao enviar reserva:", err);
+});
 }
 function carregarPratosRegistrados() {
   const container = document.getElementById('prato'); // ou outro elemento certo no seu HTML
