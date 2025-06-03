@@ -711,15 +711,54 @@ function enviarReservaParaSheets(nome, pratosSelecionados) {
   });
 }
 function carregarPratosRegistrados() {
+  const container = document.getElementById('prato'); // ou outro elemento certo no seu HTML
+  container.innerHTML = ''; // limpa antes
+
   fetch("https://script.google.com/macros/s/AKfycbzVDMZlHbkZe99DSpwhg1xAApOfucHZXsC-YdD0KNocal76DN_aZm3CJWwFTx1NsP-I/exec")
     .then(response => response.json())
     .then(data => {
-      pratosGlobais = data.filter(prato => !prato.oculto); // apenas pratos visíveis
-      localStorage.removeItem('pratos'); // Remove qualquer cópia local antiga
+      pratosGlobais = []; // limpa a lista global
+      const dias = ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira"];
+
+      dias.forEach(dia => {
+        const registros = data[dia] || [];
+
+        if (registros.length > 0) {
+          const diaTitulo = document.createElement('h3');
+          diaTitulo.textContent = `Pratos de ${dia}`;
+          container.appendChild(diaTitulo);
+
+         registros.forEach(registro => {
+         pratosGlobais.push({
+         nome: registro.prato, 
+         imagem: registro.imagem || '',
+         diaSemana: dia,
+         oculto: false
+                        });
+
+            const item = document.createElement('div');
+            item.className = 'prato-registrado';
+
+            const nomePrato = document.createElement('p');
+            nomePrato.innerHTML = `<strong>${registro.nome}</strong>`;
+
+            const imagem = document.createElement('img');
+            imagem.src = registro.imagem || '';
+            imagem.alt = registro.nome;
+            imagem.style.width = '100px';
+
+            item.appendChild(nomePrato);
+            item.appendChild(imagem);
+            container.appendChild(item);
+          });
+        } else {
+          const msg = document.createElement('p');
+          msg.textContent = `Não há pratos registrados para ${dia}.`;
+          container.appendChild(msg);
+        }
+      });
     })
-    .catch(err => {
-      console.error("Erro ao carregar pratos do backend:", err);
-    });
+    .catch(error => console.error("Erro ao carregar pratos registrados:", error));
 }
 // Função auxiliar para obter o nome do dia da semana
 function getDiaSemanaTexto(dia) {
