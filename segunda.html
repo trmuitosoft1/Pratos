@@ -528,7 +528,7 @@
 
 </body>
 <script>
- const scriptURL = "https://script.google.com/macros/s/AKfycbybeDzXilSACoYIrL4yA9jspAKYZlx_QkOqTby2KvpcpJGkRcRXRyelefzZkllYAcY/exec";
+ const scriptURL = "https://script.google.com/macros/s/AKfycbzVDMZlHbkZe99DSpwhg1xAApOfucHZXsC-YdD0KNocal76DN_aZm3CJWwFTx1NsP-I/exec";
   
  let pratosSelecionados = []; // Array para armazenar os pratos selecionados
 
@@ -681,31 +681,40 @@ function salvarPratosSelecionados() {
   document.getElementById('btnMenu').style.display = 'block'; // Mostra o botão de administração novamente
 }
 function enviarReservaParaSheets(nome, pratosSelecionados) {
-  // Envia exatamente o que o Apps Script espera
   const dadosParaEnviar = pratosSelecionados.map(p => ({
     nome: nome,
     prato: p.nome,
     diaSemana: p.dia
   }));
 
-fetch("https://script.google.com/macros/s/AKfycbybeDzXilSACoYIrL4yA9jspAKYZlx_QkOqTby2KvpcpJGkRcRXRyelefzZkllYAcY/exec", {
-  method: "POST",
+  console.log("➡️ Dados enviados para o Sheets:", dadosParaEnviar);
 
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(dadosParaEnviar)
-})
-.then(() => {
-  console.log("✔️ Reserva enviada com sucesso");
-})
-.catch(err => {
-  console.error("❌ Falha ao enviar reserva:", err);
-});
+  fetch("https://script.google.com/macros/s/AKfycbzVDMZlHbkZe99DSpwhg1xAApOfucHZXsC-YdD0KNocal76DN_aZm3CJWwFTx1NsP-I/exec", {
+    method: "POST",
+     mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(dadosParaEnviar) // ✅ Usa os dados reais!
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error("Erro na resposta: " + response.status);
+    }
+    return response.text();
+  })
+  .then(data => {
+    console.log("✔️ Reserva enviada com sucesso:", data);
+  })
+  .catch(err => {
+    console.error("❌ Falha ao enviar reserva:", err);
+  });
 }
 function carregarPratosRegistrados() {
   const container = document.getElementById('prato'); // ou outro elemento certo no seu HTML
   container.innerHTML = ''; // limpa antes
 
-  fetch("https://script.google.com/macros/s/AKfycbybeDzXilSACoYIrL4yA9jspAKYZlx_QkOqTby2KvpcpJGkRcRXRyelefzZkllYAcY/exec")
+  fetch("https://script.google.com/macros/s/AKfycbzVDMZlHbkZe99DSpwhg1xAApOfucHZXsC-YdD0KNocal76DN_aZm3CJWwFTx1NsP-I/exec")
     .then(response => response.json())
     .then(data => {
       pratosGlobais = []; // limpa a lista global
@@ -878,7 +887,7 @@ function desativarPrato(legenda) {
       console.error(err);
     });
 }
-fetch("https://script.google.com/macros/s/AKfycbybeDzXilSACoYIrL4yA9jspAKYZlx_QkOqTby2KvpcpJGkRcRXRyelefzZkllYAcY/exec?modo=ler")
+fetch("https://script.google.com/macros/s/AKfycbzVDMZlHbkZe99DSpwhg1xAApOfucHZXsC-YdD0KNocal76DN_aZm3CJWwFTx1NsP-I/exec?modo=ler")
   .then(response => response.json())
   .then(data => {
     if (data && Array.isArray(data)) {
@@ -1006,7 +1015,7 @@ function saveToSheet(name, imageBase64, day) {
     values: values
   };
 
-  const url = `https://script.google.com/macros/s/AKfycbybeDzXilSACoYIrL4yA9jspAKYZlx_QkOqTby2KvpcpJGkRcRXRyelefzZkllYAcY/exec`;
+  const url = `https://script.google.com/macros/s/AKfycbzVDMZlHbkZe99DSpwhg1xAApOfucHZXsC-YdD0KNocal76DN_aZm3CJWwFTx1NsP-I/exec`;
 
   fetch(url, {
     method: 'PUT',
