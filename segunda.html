@@ -528,7 +528,7 @@
 
 </body>
 <script>
- const scriptURL = "https://script.google.com/macros/s/AKfycbzVDMZlHbkZe99DSpwhg1xAApOfucHZXsC-YdD0KNocal76DN_aZm3CJWwFTx1NsP-I/exec";
+ const scriptURL = "https://script.google.com/macros/s/AKfycbzgpdGOICpl4FifZQ7TmrZDD8QxBX6k27uGRj-eWnbvjUyd0hkmnDcbWAuIWS0K-hI/exec";
   
  let pratosSelecionados = []; // Array para armazenar os pratos selecionados
 
@@ -689,7 +689,7 @@ function enviarReservaParaSheets(nome, pratosSelecionados) {
 
   console.log("➡️ Dados enviados para o Sheets:", dadosParaEnviar);
 
-  fetch("https://script.google.com/macros/s/AKfycbzVDMZlHbkZe99DSpwhg1xAApOfucHZXsC-YdD0KNocal76DN_aZm3CJWwFTx1NsP-I/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbzgpdGOICpl4FifZQ7TmrZDD8QxBX6k27uGRj-eWnbvjUyd0hkmnDcbWAuIWS0K-hI/exec", {
     method: "POST",
      mode: "no-cors",
     headers: {
@@ -711,54 +711,15 @@ function enviarReservaParaSheets(nome, pratosSelecionados) {
   });
 }
 function carregarPratosRegistrados() {
-  const container = document.getElementById('prato'); // ou outro elemento certo no seu HTML
-  container.innerHTML = ''; // limpa antes
-
-  fetch("https://script.google.com/macros/s/AKfycbzVDMZlHbkZe99DSpwhg1xAApOfucHZXsC-YdD0KNocal76DN_aZm3CJWwFTx1NsP-I/exec")
+  fetch("https://script.google.com/macros/s/AKfycbzgpdGOICpl4FifZQ7TmrZDD8QxBX6k27uGRj-eWnbvjUyd0hkmnDcbWAuIWS0K-hI/exec")
     .then(response => response.json())
     .then(data => {
-      pratosGlobais = []; // limpa a lista global
-      const dias = ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira"];
-
-      dias.forEach(dia => {
-        const registros = data[dia] || [];
-
-        if (registros.length > 0) {
-          const diaTitulo = document.createElement('h3');
-          diaTitulo.textContent = `Pratos de ${dia}`;
-          container.appendChild(diaTitulo);
-
-         registros.forEach(registro => {
-         pratosGlobais.push({
-         nome: registro.prato, 
-         imagem: registro.imagem || '',
-         diaSemana: dia,
-         oculto: false
-                        });
-
-            const item = document.createElement('div');
-            item.className = 'prato-registrado';
-
-            const nomePrato = document.createElement('p');
-            nomePrato.innerHTML = `<strong>${registro.nome}</strong>`;
-
-            const imagem = document.createElement('img');
-            imagem.src = registro.imagem || '';
-            imagem.alt = registro.nome;
-            imagem.style.width = '100px';
-
-            item.appendChild(nomePrato);
-            item.appendChild(imagem);
-            container.appendChild(item);
-          });
-        } else {
-          const msg = document.createElement('p');
-          msg.textContent = `Não há pratos registrados para ${dia}.`;
-          container.appendChild(msg);
-        }
-      });
+      pratosGlobais = data.filter(prato => !prato.oculto); // apenas pratos visíveis
+      localStorage.removeItem('pratos'); // Remove qualquer cópia local antiga
     })
-    .catch(error => console.error("Erro ao carregar pratos registrados:", error));
+    .catch(err => {
+      console.error("Erro ao carregar pratos do backend:", err);
+    });
 }
 // Função auxiliar para obter o nome do dia da semana
 function getDiaSemanaTexto(dia) {
@@ -887,7 +848,7 @@ function desativarPrato(legenda) {
       console.error(err);
     });
 }
-fetch("https://script.google.com/macros/s/AKfycbzVDMZlHbkZe99DSpwhg1xAApOfucHZXsC-YdD0KNocal76DN_aZm3CJWwFTx1NsP-I/exec?modo=ler")
+fetch("https://script.google.com/macros/s/AKfycbzgpdGOICpl4FifZQ7TmrZDD8QxBX6k27uGRj-eWnbvjUyd0hkmnDcbWAuIWS0K-hI/exec?modo=ler")
   .then(response => response.json())
   .then(data => {
     if (data && Array.isArray(data)) {
@@ -1015,7 +976,7 @@ function saveToSheet(name, imageBase64, day) {
     values: values
   };
 
-  const url = `https://script.google.com/macros/s/AKfycbzVDMZlHbkZe99DSpwhg1xAApOfucHZXsC-YdD0KNocal76DN_aZm3CJWwFTx1NsP-I/exec`;
+  const url = `https://script.google.com/macros/s/AKfycbzgpdGOICpl4FifZQ7TmrZDD8QxBX6k27uGRj-eWnbvjUyd0hkmnDcbWAuIWS0K-hI/exec`;
 
   fetch(url, {
     method: 'PUT',
@@ -1033,7 +994,7 @@ function verTodosOsPratos() {
   console.log('Dia selecionado:', diaSemanaFiltro);
 
   // Obter os pratos do localStorage
-  const pratos = JSON.parse(localStorage.getItem('pratos')) || [];
+  const pratos = pratosGlobais;
   console.log('Pratos no localStorage:', pratos);
 
   // Filtrar os pratos pelo dia selecionado
