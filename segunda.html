@@ -936,7 +936,7 @@ function guardarPrato() {
 
     // Primeiro salva no localStorage
     const pratos = JSON.parse(localStorage.getItem('pratos')) || [];
-    pratos.push({ nome: novoPrato.prato, diaSemana: novoPrato.diaSemana, imagem: novoPrato.imagem });
+   pratos.push({ nome: novoPrato.prato, diaSemana: diaSemanaTexto, imagem: novoPrato.imagem });
     localStorage.setItem('pratos', JSON.stringify(pratos));
 
     // Atualiza a UI logo após salvar localmente
