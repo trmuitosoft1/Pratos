@@ -813,7 +813,43 @@ function enviarReservaParaSheets(nome, pratosSelecionados) {
     });
   });
 }
-  function handleResponse(data) {
+const nomesImagens = [
+  "bacalhau.png",
+  "frango.png",
+  "bitoque.png",
+  "cozido.png",
+  "lasanha.png"
+];
+
+// Base URL raw do GitHub onde as imagens estão hospedadas
+const baseGitHubRaw = "https://raw.githubusercontent.com/trmuitosoft1/Pratos/main/Imagens/";
+ 
+function ajustarUrlsImagens(pratos) {
+  return pratos.map(p => {
+    // Se imagem não existe ou está vazia, tenta usar o nome do prato para casar com nomesImagens
+    if (!p.imagem || p.imagem.trim() === "") {
+      // Tenta achar imagem pelo nome do prato (ex: prato.nome = "bacalhau")
+      const nomeImagem = nomesImagens.find(imgName => {
+        const nomePratoSemExt = imgName.replace(/\.[^/.]+$/, "").toLowerCase(); // retira extensão e baixa
+        return p.nome.toLowerCase().includes(nomePratoSemExt);
+      });
+      if (nomeImagem) {
+        return {...p, imagem: baseGitHubRaw + nomeImagem};
+      } else {
+        // Sem imagem encontrada, usa placeholder
+        return {...p, imagem: "https://via.placeholder.com/100"};
+      }
+    } else if (!p.imagem.startsWith("http")) {
+      // Se imagem existe mas não tem URL completa, adiciona base GitHub
+      return {...p, imagem: baseGitHubRaw + p.imagem};
+    } else {
+      // Já é URL completa, deixa como está
+      return p;
+    }
+  });
+}
+
+function handleResponse(data) {
     console.log("Dados recebidos:", data);
     // Atualiza UI com os pratos
   }
