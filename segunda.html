@@ -1279,7 +1279,7 @@ window.onload = () => {
 };
 
 function guardarPrato() {
- console.log("Função guardarPrato chamada!");
+  console.log("Função guardarPrato chamada!");
   const fileInput = document.querySelector('.novaImagem');
   const nomeInput = document.querySelector('.novoNome');
   const diaSelect = document.querySelector('#diaSemanaAdmin');
@@ -1287,29 +1287,23 @@ function guardarPrato() {
     alert("Preencha todos os campos antes de guardar!");
     return;
   }
-  const reader = new FileReader();
-  reader.onload = function (event) {
-    const base64Image = event.target.result;
+
+  // Redimensiona/comprime a imagem antes de enviar
+  redimensionarImagem(fileInput.files[0], 600, 600, function(base64Image) {
     const nomePrato = nomeInput.value.trim();
     const diaSemanaNumero = diaSelect.value;
     const dias = ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira"];
     const diaSemanaTexto = dias[Number(diaSemanaNumero) - 1];
     console.log("Enviando prato:", nomePrato, diaSemanaTexto);
 
-    // Chama a função correta para enviar o prato
     enviarNovoPratoParaSheets({
       nome: nomePrato,
       diaSemana: diaSemanaTexto,
       imagem: base64Image
     });
-  };
-
-  reader.onerror = function () {
-    alert("Erro ao ler o arquivo. Por favor, tente novamente.");
-  };
-
-  reader.readAsDataURL(fileInput.files[0]);
+  });
 }
+
 
 function enviarNovoPratoParaSheets(pratoObj) {
   console.log("Enviando para proxy.php:", pratoObj);
@@ -1330,6 +1324,40 @@ function enviarNovoPratoParaSheets(pratoObj) {
 .catch(() => {
   alert("Erro ao enviar o prato.");
 });
+}
+
+function redimensionarImagem(file, maxWidth, maxHeight, callback) {
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const img = new Image();
+    img.onload = function() {
+      let width = img.width;
+      let height = img.height;
+
+      // Calcula nova largura/altura mantendo proporção
+      if (width > maxWidth) {
+        height *= maxWidth / width;
+        width = maxWidth;
+      }
+      if (height > maxHeight) {
+        width *= maxHeight / height;
+        height = maxHeight;
+      }
+
+      // Redimensiona num canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Exporta para base64 (JPEG, qualidade 0.7)
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      callback(dataUrl);
+    };
+    img.src = event.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
 function desativarPrato(legenda) {
@@ -1496,6 +1524,7 @@ function saveToSheet(name, imageBase64, day) {
     .then(data => console.log('Dados salvos no Google Sheets', data))
     .catch(error => console.error('Erro ao salvar no Google Sheets:', error));
 }
+
 function verTodosOsPratos() {
   const diaSemanaFiltro = document.getElementById('diaSemanaFiltro').value;
   console.log('Dia selecionado:', diaSemanaFiltro);
