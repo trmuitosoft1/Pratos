@@ -1288,8 +1288,10 @@ function guardarPrato() {
     return;
   }
 
-  // Redimensiona/comprime a imagem antes de enviar
-  redimensionarImagem(fileInput.files[0], 600, 600, function(base64Image) {
+  // NÃO redimensiona, apenas lê a imagem original
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const base64Image = event.target.result;
     const nomePrato = nomeInput.value.trim();
     const diaSemanaNumero = diaSelect.value;
     const dias = ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira"];
@@ -1301,7 +1303,8 @@ function guardarPrato() {
       diaSemana: diaSemanaTexto,
       imagem: base64Image
     });
-  });
+  };
+  reader.readAsDataURL(fileInput.files[0]);
 }
 
 
