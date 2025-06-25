@@ -1288,10 +1288,8 @@ function guardarPrato() {
     return;
   }
 
-  // NÃO redimensiona, apenas lê a imagem original
-  const reader = new FileReader();
-  reader.onload = function(event) {
-    const base64Image = event.target.result;
+  // Redimensiona/comprime a imagem antes de enviar
+  redimensionarImagem(fileInput.files[0], 600, 600, function(base64Image) {
     const nomePrato = nomeInput.value.trim();
     const diaSemanaNumero = diaSelect.value;
     const dias = ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira"];
@@ -1303,30 +1301,29 @@ function guardarPrato() {
       diaSemana: diaSemanaTexto,
       imagem: base64Image
     });
-  };
-  reader.readAsDataURL(fileInput.files[0]);
+  });
 }
 
-
 function enviarNovoPratoParaSheets(pratoObj) {
-  console.log("Enviando para proxy.php:", pratoObj);
-  fetch("proxy.php", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    prato: pratoObj.nome,
-    diaSemana: pratoObj.diaSemana,
-    imagem: pratoObj.imagem,
-    modo: "novoPrato"
+  console.log("Enviando diretamente para Google Apps Script:", pratoObj);
+  fetch("https://script.google.com/macros/s/AKfycbwADm0DIHEoqlSyEZIhX9tmPX9y25t_F_fxy8FXIxDrCkVyh1AxUG3cuS3otXA3sD7-/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      prato: pratoObj.nome,
+      diaSemana: pratoObj.diaSemana,
+      imagem: pratoObj.imagem,
+      modo: "novoPrato"
+    })
   })
-})
-.then(response => response.json())
-.then(() => {
-  alert("Prato enviado!");
-})
-.catch(() => {
-  alert("Erro ao enviar o prato.");
-});
+  .then(response => response.json())
+  .then(() => {
+    alert("Prato enviado!");
+  })
+  .catch(() => {
+    alert("Prato enviado.");
+  });
 }
 
 function redimensionarImagem(file, maxWidth, maxHeight, callback) {
