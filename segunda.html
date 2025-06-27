@@ -572,7 +572,7 @@
   document.getElementById("grid-container").style.display = "none";
 };
 document.getElementById('containerPratos').style.display = 'block'; 
-const scriptURL = "https://script.google.com/macros/s/AKfycbwADm0DIHEoqlSyEZIhX9tmPX9y25t_F_fxy8FXIxDrCkVyh1AxUG3cuS3otXA3sD7-/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec";
 
  function verificarDiasEChamar() {
   const diasSelecionados = [];
@@ -677,7 +677,7 @@ function verPratosFiltradosPorDias(diasSelecionados) {
 
   // Adiciona o script JSONP para buscar os dados
   const script = document.createElement('script');
-  script.src = 'https://script.google.com/macros/s/AKfycbwADm0DIHEoqlSyEZIhX9tmPX9y25t_F_fxy8FXIxDrCkVyh1AxUG3cuS3otXA3sD7-/exec?modo=pratos&callback=callbackDosPratos';
+  script.src = 'https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec?modo=pratos&callback=callbackDosPratos';
   document.body.appendChild(script);
 }
 // Substitua o onclick do botão "Ver Prato" por esta função:
@@ -699,16 +699,18 @@ for (const dia in data) {
     arrayPratos.push({
       nome: prato.prato || prato.nome,
       diaSemana: prato.diaSemana || dia,
-      imagem: prato.imagem
+      imagem: prato.imagem,
+      oculto: prato.oculto // <-- Mantém isto!
     });
   });
+
 }
   console.log("Array de pratos:", arrayPratos);
   mostrarTelaSelecaoPratos(arrayPratos, diasSelecionados);
   delete window.receberPratosParaCliente;
 };
   const script = document.createElement('script');
-  script.src = 'https://script.google.com/macros/s/AKfycbwADm0DIHEoqlSyEZIhX9tmPX9y25t_F_fxy8FXIxDrCkVyh1AxUG3cuS3otXA3sD7-/exec?modo=pratos&callback=receberPratosParaCliente';
+  script.src = 'https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec?modo=pratos&callback=receberPratosParaCliente';
   document.body.appendChild(script);
 };
 
@@ -730,7 +732,7 @@ window.receberPratosParaCliente = function(data) {
 };
 
 function mostrarTelaSelecaoPratos(pratos, diasSelecionados) {
- document.querySelector('.container').classList.add('container-grande');
+  document.querySelector('.container').classList.add('container-grande');
   const telaPratos = document.getElementById('telaPratos');
   telaPratos.innerHTML = '';
   telaPratos.style.display = 'flex';
@@ -743,15 +745,12 @@ function mostrarTelaSelecaoPratos(pratos, diasSelecionados) {
   const pratosPorDia = {};
   diasSelecionados.forEach(dia => {
     pratosPorDia[dia] = pratos.filter(prato => {
-      // Suporta tanto número como string
       return prato.diaSemana == dia || getDiaSemanaTexto(prato.diaSemana) == dia;
     });
   });
 
-  // Descobre o máximo de pratos em qualquer dia (para as linhas)
   const maxPratos = Math.max(...Object.values(pratosPorDia).map(lista => lista.length));
 
-  // Cria o grid
   const grid = document.createElement('div');
   grid.style.display = 'grid';
   grid.style.gridTemplateColumns = `repeat(${diasSelecionados.length}, 180px)`;
@@ -759,7 +758,6 @@ function mostrarTelaSelecaoPratos(pratos, diasSelecionados) {
   grid.style.justifyContent = 'center';
   grid.style.width = '100%';
 
-  // Cabeçalho dos dias
   diasSelecionados.forEach(dia => {
     const th = document.createElement('div');
     th.textContent = dia;
@@ -769,7 +767,6 @@ function mostrarTelaSelecaoPratos(pratos, diasSelecionados) {
     grid.appendChild(th);
   });
 
-  // Grelha dos pratos (linhas)
   for (let i = 0; i < maxPratos; i++) {
     diasSelecionados.forEach(dia => {
       const listaDia = pratosPorDia[dia];
@@ -788,26 +785,38 @@ function mostrarTelaSelecaoPratos(pratos, diasSelecionados) {
         cell.style.borderRadius = '8px';
         cell.style.padding = '12px';
         cell.style.background = '#fafafa';
-        cell.style.cursor = 'pointer';
         cell.style.transition = '0.2s';
 
-        cell.innerHTML = `
-          <img src="${prato.imagem || 'https://dummyimage.com/150x150/cccccc/000000&text=Sem+Imagem'}" 
-               alt="Imagem do Prato" style="max-width:120px; border-radius:8px;">
-          <p style="margin: 8px 0 0 0; font-weight: bold;">${prato.nome}</p>
-        `;
-
-        cell.onclick = () => {
-          if (cell.classList.contains('selected')) {
-            cell.classList.remove('selected');
-            pratosSelecionadosArr = pratosSelecionadosArr.filter(p => p !== prato);
-          } else {
-            cell.classList.add('selected');
-            pratosSelecionadosArr.push(prato);
-          }
-        };
+        // Se o prato está oculto, mostra como desativado e não permite selecionar
+        if (
+          String(prato.oculto).toLowerCase() === "ocultado" ||
+          String(prato.oculto).toUpperCase() === "TRUE"
+        ) {
+          cell.style.opacity = '0.5';
+          cell.style.pointerEvents = 'none';
+          cell.innerHTML = `
+            <img src="${prato.imagem || 'https://dummyimage.com/150x150/cccccc/000000&text=Sem+Imagem'}" 
+                 alt="Imagem do Prato" style="max-width:120px; border-radius:8px;">
+            <p style="margin: 8px 0 0 0; font-weight: bold;">${prato.nome}</p>
+            <span style="color:red; font-size:14px;">Prato não disponível</span>
+          `;
+        } else {
+          cell.innerHTML = `
+            <img src="${prato.imagem || 'https://dummyimage.com/150x150/cccccc/000000&text=Sem+Imagem'}" 
+                 alt="Imagem do Prato" style="max-width:120px; border-radius:8px;">
+            <p style="margin: 8px 0 0 0; font-weight: bold;">${prato.nome}</p>
+          `;
+          cell.onclick = () => {
+            if (cell.classList.contains('selected')) {
+              cell.classList.remove('selected');
+              pratosSelecionadosArr = pratosSelecionadosArr.filter(p => p !== prato);
+            } else {
+              cell.classList.add('selected');
+              pratosSelecionadosArr.push(prato);
+            }
+          };
+        }
       } else {
-        // Célula vazia para alinhar
         cell.style.background = 'transparent';
         cell.style.border = 'none';
         cell.innerHTML = '&nbsp;';
@@ -819,12 +828,10 @@ function mostrarTelaSelecaoPratos(pratos, diasSelecionados) {
 
   telaPratos.appendChild(grid);
 
-  // Se não houver pratos para mostrar
   if (maxPratos === 0) {
     telaPratos.innerHTML += '<p style="color:#888;">Nenhum prato disponível para os dias selecionados.</p>';
   }
 
-  // Botões no fundo
   const botoesDiv = document.createElement('div');
   botoesDiv.style.marginTop = '32px';
   botoesDiv.style.display = 'flex';
@@ -842,10 +849,11 @@ function mostrarTelaSelecaoPratos(pratos, diasSelecionados) {
   btnConcluir.style.border = 'none';
   btnConcluir.style.cursor = 'pointer';
 
-btnConcluir.onclick = () => {
-  const nomeCliente = document.getElementById('nome').value.trim();
-  enviarReservaParaSheets(nomeCliente, pratosSelecionadosArr);
-};
+  btnConcluir.onclick = () => {
+    const nomeCliente = document.getElementById('nome').value.trim();
+    enviarReservaParaSheets(nomeCliente, pratosSelecionadosArr);
+  };
+
   const btnVoltar = document.createElement('button');
   btnVoltar.textContent = 'Voltar';
   btnVoltar.style.padding = '10px 28px';
@@ -860,7 +868,7 @@ btnConcluir.onclick = () => {
   btnVoltar.onclick = () => {
     telaPratos.style.display = 'none';
     document.querySelector('.formulario').style.display = 'block';
- document.querySelector('.container').classList.remove('container-grande');
+    document.querySelector('.container').classList.remove('container-grande');
   };
 
   botoesDiv.appendChild(btnConcluir);
@@ -868,7 +876,6 @@ btnConcluir.onclick = () => {
 
   telaPratos.appendChild(botoesDiv);
 
-  // Esconde o formulário principal
   document.querySelector('.formulario').style.display = 'none';
 }
 
@@ -895,7 +902,7 @@ console.log("📦 Pratos disponíveis:", pratosGlobais);
 
 function carregarPratosRegistrados() {
   const script = document.createElement('script');
-  script.src = 'https://script.google.com/macros/s/AKfycbwADm0DIHEoqlSyEZIhX9tmPX9y25t_F_fxy8FXIxDrCkVyh1AxUG3cuS3otXA3sD7-/exec?modo=pratos&callback=receberDadosSheets';
+  script.src = 'https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec?modo=pratos&callback=receberDadosSheets';
   document.body.appendChild(script);
 }
 window.onload = function() {
@@ -934,7 +941,7 @@ function submeter() {
 
   // Carrega os dados usando JSONP
   const script = document.createElement('script');
-  script.src = 'https://script.google.com/macros/s/AKfycbwADm0DIHEoqlSyEZIhX9tmPX9y25t_F_fxy8FXIxDrCkVyh1AxUG3cuS3otXA3sD7-/exec?modo=pratos&callback=receberPratosParaSubmeter';
+  script.src = 'https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec?modo=pratos&callback=receberPratosParaSubmeter';
   document.body.appendChild(script);
 }
 function converterDia(diaString) {
@@ -961,7 +968,7 @@ async function mostrarPratosParaCliente(diasSelecionados) {
     return;
   }
 
-  const response = await fetch('https://script.google.com/macros/s/AKfycbwADm0DIHEoqlSyEZIhX9tmPX9y25t_F_fxy8FXIxDrCkVyh1AxUG3cuS3otXA3sD7-/exec', {
+  const response = await fetch('https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ modo: 'filtrar', dias: diasSelecionados })
@@ -989,16 +996,37 @@ async function mostrarPratosParaCliente(diasSelecionados) {
 }
 
 function voltarMenu() {
-    // Esconde a tela de pratos
-    document.getElementById('telaPratos').style.display = 'none';
+  // Ocultar botões de reserva ao voltar para o menu inicial
+  var botoesReserva = document.getElementById('botoesReserva');
+  if (botoesReserva) botoesReserva.style.display = 'none';
 
-    // Mostra o menu/formulário principal (ajuste o seletor se necessário)
-    var menu = document.querySelector('.formulario');
-    if (menu) menu.style.display = 'block';
+  // Ocultar todas as seções
+  var todosPratos = document.getElementById('todosPratos');
+  if (todosPratos) todosPratos.style.display = 'none';
 
-    // Limpa a lista de pratos
-    var lista = document.getElementById('listaPratos');
-    if (lista) lista.innerHTML = '';
+  var opcoesAdmin = document.getElementById('opcoesAdmin');
+  if (opcoesAdmin) opcoesAdmin.style.display = 'none';
+
+  var editor = document.getElementById('editor');
+  if (editor) editor.style.display = 'none';
+
+  var login = document.getElementById('login');
+  if (login) login.style.display = 'none';
+
+  var prato = document.getElementById('prato');
+  if (prato) prato.style.display = 'none';
+
+  // Mostrar a tela inicial (formulário principal)
+  var formulario = document.querySelector(".formulario");
+  if (formulario) formulario.style.display = 'block';
+
+  var titulo = document.getElementById('titulo');
+  if (titulo) titulo.style.display = 'block';
+
+  var btnMenu = document.getElementById('btnMenu');
+  if (btnMenu) btnMenu.style.display = 'block';
+
+  document.querySelectorAll('#diaSemanaCliente input[type="checkbox"]').forEach(cb => cb.checked = false);
 }
 
 function pratosFiltradosCallback(pratos) {
@@ -1028,7 +1056,7 @@ function pratosFiltradosCallback(pratos) {
 
 function verPratosPublicos() {
   const script = document.createElement('script');
-  script.src = 'https://script.google.com/macros/s/AKfycbwADm0DIHEoqlSyEZIhX9tmPX9y25t_F_fxy8FXIxDrCkVyh1AxUG3cuS3otXA3sD7-/exec?modo=pratos&callback=renderizarPratosPublicos';
+  script.src = 'https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec?modo=pratos&callback=renderizarPratosPublicos';
   document.body.appendChild(script);
 }
 
@@ -1103,7 +1131,7 @@ function salvarPratosSelecionados(pratosSelecionadosArr) {
       diaSemana: p.dia,
       modo: "reserva"
     };
-    return fetch("https://script.google.com/macros/s/AKfycbwADm0DIHEoqlSyEZIhX9tmPX9y25t_F_fxy8FXIxDrCkVyh1AxUG3cuS3otXA3sD7-/exec", {
+    return fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec", {
       method: "POST",
       mode: "no-cors",
       headers: {
@@ -1144,7 +1172,7 @@ function enviarReservaParaSheets(nomeCliente, pratosSelecionados) {
       diaSemana: pratoObj.dia || pratoObj.diaSemana,
       modo: "reserva"
     };
-    return fetch("https://script.google.com/macros/s/AKfycbwADm0DIHEoqlSyEZIhX9tmPX9y25t_F_fxy8FXIxDrCkVyh1AxUG3cuS3otXA3sD7-/exec", {
+    return fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec", {
       method: "POST",
       mode: "no-cors",
       headers: {
@@ -1214,7 +1242,7 @@ function handleResponse(data) {
   }
 
   const script = document.createElement('script');
-  script.src = 'https://script.google.com/macros/s/AKfycbwADm0DIHEoqlSyEZIhX9tmPX9y25t_F_fxy8FXIxDrCkVyh1AxUG3cuS3otXA3sD7-/exec?modo=ler&callback=handleResponse';
+  script.src = 'https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec?modo=ler&callback=handleResponse';
   document.body.appendChild(script);
 
 // Função auxiliar para obter o nome do dia da semana
@@ -1306,7 +1334,7 @@ function guardarPrato() {
 
 function enviarNovoPratoParaSheets(pratoObj) {
   console.log("Enviando diretamente para Google Apps Script:", pratoObj);
-  fetch("https://script.google.com/macros/s/AKfycbwADm0DIHEoqlSyEZIhX9tmPX9y25t_F_fxy8FXIxDrCkVyh1AxUG3cuS3otXA3sD7-/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec", {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
@@ -1383,7 +1411,7 @@ function desativarPrato(legenda) {
       console.error(err);
     });
 }
-fetch("https://script.google.com/macros/s/AKfycbwADm0DIHEoqlSyEZIhX9tmPX9y25t_F_fxy8FXIxDrCkVyh1AxUG3cuS3otXA3sD7-/exec?modo=ler")
+fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec?modo=ler")
   .then(response => response.json())
   .then(data => {
     if (data && Array.isArray(data)) {
@@ -1399,7 +1427,8 @@ fetch("https://script.google.com/macros/s/AKfycbwADm0DIHEoqlSyEZIhX9tmPX9y25t_F_
 
 function voltarMenu() {
   // Ocultar botões de reserva ao voltar para o menu inicial
-  document.getElementById('botoesReserva').style.display = 'none';
+var botoesReserva = document.getElementById('botoesReserva');
+if (botoesReserva) botoesReserva.style.display = 'none';
 
   // Ocultar todas as seções
   document.getElementById('todosPratos').style.display = 'none';
@@ -1502,141 +1531,136 @@ function handleImageUpload(event) {
   reader.readAsDataURL(file); // Converte a imagem para base64
 }
 
-function saveToSheet(name, imageBase64, day) {
-  const sheetId = 'ID_DO_SEU_GOOGLE_SHEET';
-  const range = 'Sheet1!A:C'; // Onde os dados vão ser salvos
-  const values = [[name, imageBase64, day]]; // Dados a serem salvos
-  
-  const body = {
-    values: values
-  };
-
-  const url = `https://script.google.com/macros/s/AKfycbwADm0DIHEoqlSyEZIhX9tmPX9y25t_F_fxy8FXIxDrCkVyh1AxUG3cuS3otXA3sD7-/exec`;
-
-  fetch(url, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  })
-    .then(response => response.json())
-    .then(data => console.log('Dados salvos no Google Sheets', data))
-    .catch(error => console.error('Erro ao salvar no Google Sheets:', error));
-}
-
 function verTodosOsPratos() {
-  const diaSemanaFiltro = document.getElementById('diaSemanaFiltro').value;
-  console.log('Dia selecionado:', diaSemanaFiltro);
+  document.getElementById('todosPratos').style.display = 'block';
+  document.getElementById('opcoesAdmin').style.display = 'none';
 
-  // Obter os pratos do localStorage
-  const pratos = JSON.parse(localStorage.getItem('pratos')) || [];
-  console.log('Pratos no localStorage:', pratos);
+  const diaSelecionado = document.getElementById('diaSemanaFiltro').value;
 
-  // Filtrar os pratos pelo dia selecionado
-  const pratosFiltrados = pratos.filter(prato => parseInt(prato.diaSemana) === parseInt(diaSemanaFiltro));
-  console.log('Pratos filtrados:', pratosFiltrados);
+  // Define o callback ANTES de adicionar o script!
+  window.receberTodosPratosAdmin = function(data) {
+    const pratos = [];
+    const diaFiltroNum = Number(diaSelecionado);
 
-  const lista = document.getElementById('pratos-list');
-  lista.innerHTML = ''; // Limpa a lista antes de adicionar novos pratos
+    function getDiaSemanaTexto(numero) {
+      const dias = {
+        1: 'Segunda-feira',
+        2: 'Terça-feira',
+        3: 'Quarta-feira',
+        4: 'Quinta-feira',
+        5: 'Sexta-feira'
+      };
+      return dias[Number(numero)] || String(numero);
+    }
 
-  if (pratosFiltrados.length > 0) {
-    pratosFiltrados.forEach(prato => {
+    for (const dia in data) {
+      data[dia].forEach(prato => {
+        const diaPratoTexto = typeof (prato.diaSemana) === "number"
+          ? getDiaSemanaTexto(prato.diaSemana)
+          : (prato.diaSemana || dia);
+        if (diaPratoTexto === getDiaSemanaTexto(Number(diaSelecionado))) {
+          pratos.push({
+            nome: prato.nome || prato.prato, // <-- Corrigido aqui!
+            imagem: prato.imagem,
+            diaSemana: diaPratoTexto,
+            oculto: prato.oculto === "TRUE" || prato.oculto === "ocultado"
+          });
+        }
+      });
+    }
+
+    const lista = document.getElementById('pratos-list');
+    lista.innerHTML = '';
+    if (pratos.length === 0) {
+      lista.innerHTML = '<p>Não há pratos registrados para este dia.</p>';
+      return;
+    }
+
+    pratos.forEach(prato => {
       const li = document.createElement('li');
-      li.style.position = 'relative'; // Para posicionar os botões corretamente
-
-      // Se o prato estiver oculto, aplica transparência
-      if (prato.oculto) {
-        li.style.opacity = '0.5'; // Torna o prato transparente
-      }
-
+      li.style.position = 'relative';
+      const estaOculto = prato.oculto === true;
+      if (estaOculto) li.style.opacity = '0.5';
       li.innerHTML = `
-        <img src="${prato.imagem}" alt="Imagem do Prato" style="width: 100px; height: auto; border-radius: 10px; margin-bottom: 10px;">
-        <span>${prato.nome}</span>
+        <img src="${prato.imagem}" alt="Imagem do Prato" style="width: 100px; border-radius: 10px; margin-bottom: 10px;">
+        <span>${prato.nome} (${getDiaSemanaTexto(prato.diaSemana)})</span>
+        <span style="color:red; font-size:14px; display:${estaOculto ? 'block' : 'none'};">Prato não disponível</span>
       `;
 
-      // Botão de ativar (aparece apenas se o prato estiver oculto)
-      if (prato.oculto) {
-        const btnAtivar = document.createElement('button');
-        btnAtivar.textContent = 'Ativar';
-        btnAtivar.onclick = () => {
-          ativarPrato(prato);
-          verTodosOsPratos(); // Atualiza a lista após ativar
-        };
-        li.appendChild(btnAtivar);
-      } else {
-        // Botão de remover
-        const btnRemover = document.createElement('button');
-        btnRemover.textContent = 'Remover';
-        btnRemover.onclick = () => {
-          removerPrato(prato);
-          verTodosOsPratos(); // Atualiza a lista após remover
-        };
+      const btnOcultar = document.createElement('button');
+      btnOcultar.textContent = estaOculto ? 'Ativar' : 'Ocultar';
 
-        // Botão de ocultar
-        const btnOcultar = document.createElement('button');
-        btnOcultar.textContent = 'Ocultar';
-        btnOcultar.onclick = () => {
-          ocultarPrato(prato);
-          verTodosOsPratos(); // Atualiza a lista após ocultar
-        };
+      btnOcultar.onclick = () => {
+        const novoEstado = estaOculto ? "ativarPrato" : "ocultarPrato";
+fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec", {
+  method: "POST",
+  mode: "no-cors",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    modo: novoEstado,
+    prato: prato.nome,
+    diaSemana: prato.diaSemana
+  })
+})
+.then(response => response.json())
+.then(data => {
+  if (data.sucesso) {
+    verTodosOsPratos();
+  } else {
+    alert("Erro ao atualizar o estado do prato.");
+  }
+})
+.catch(() => {
+  alert("Prato atualizado.");
+});
+      };
 
-        // Adiciona os botões ao item da lista
-        li.appendChild(btnRemover);
-        li.appendChild(btnOcultar);
-      }
-
+      li.appendChild(btnOcultar);
       lista.appendChild(li);
     });
-  } else {
-    lista.innerHTML = '<p>Não há pratos registrados para este dia.</p>';
-  }
-}
-function removerPrato(prato) {
-  const confirmacao = confirm(`Tem certeza de que deseja remover o prato "${prato.nome}"?`);
-  if (!confirmacao) return;
 
-  let pratos = JSON.parse(localStorage.getItem('pratos')) || [];
-  pratos = pratos.filter(p => p.nome !== prato.nome || p.diaSemana !== prato.diaSemana);
-  localStorage.setItem('pratos', JSON.stringify(pratos));
+    delete window.receberTodosPratosAdmin;
+  };
 
-  alert(`O prato "${prato.nome}" foi removido com sucesso.`);
+  // Só depois de definir o callback, adiciona o script!
+  const script = document.createElement('script');
+  script.src = 'https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec?modo=pratos&callback=receberTodosPratosAdmin';
+  document.body.appendChild(script);
 }
 
-function ocultarPrato(prato) {
-  const confirmacao = confirm(`Tem certeza de que deseja ocultar o prato "${prato.nome}"?`);
-  if (!confirmacao) return;
-
-  let pratos = JSON.parse(localStorage.getItem('pratos')) || [];
-  pratos = pratos.map(p => {
-    if (p.nome === prato.nome && p.diaSemana === prato.diaSemana) {
-      return { ...p, oculto: true };
-    }
-    return p;
+// Função auxiliar para garantir que o diaSemana vai como texto correto
+function getDiaSemanaTexto(numero) {
+  const dias = {
+    1: 'Segunda-feira',
+    2: 'Terça-feira',
+    3: 'Quarta-feira',
+    4: 'Quinta-feira',
+    5: 'Sexta-feira'
+  };
+  return dias[Number(numero)] || String(numero);
+}
+  
+function limparPratoSheets(prato) {
+  const nomePrato = String(prato.nome).trim();
+  const diaSemanaTexto = getDiaSemanaTexto(prato.diaSemana);
+  const dados = {
+    modo: "limparPrato",
+    prato: nomePrato,
+    diaSemana: diaSemanaTexto
+  };
+  fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dados)
   });
-  localStorage.setItem('pratos', JSON.stringify(pratos));
-
-  alert(`O prato "${prato.nome}" foi ocultado.`);
+  alert('Prato ocultado e dados limpos com sucesso (atualize a lista para ver mudanças).');
 }
 
-function ativarPrato(prato) {
-  const confirmacao = confirm(`Tem certeza de que deseja ativar o prato "${prato.nome}"?`);
-  if (!confirmacao) return;
-
-  let pratos = JSON.parse(localStorage.getItem('pratos')) || [];
-  pratos = pratos.map(p => {
-    if (p.nome === prato.nome && p.diaSemana === prato.diaSemana) {
-      return { ...p, oculto: false };
-    }
-    return p;
-  });
-  localStorage.setItem('pratos', JSON.stringify(pratos));
-
-  alert(`O prato "${prato.nome}" foi ativado.`);
-}
-    function voltar() {
+function voltar() {
       window.history.back(); // Volta para a página anterior
     }
+
 function mostrarPratoDaUrl() {
   const urlParams = new URLSearchParams(window.location.search);
   const prato = {
@@ -1656,6 +1680,30 @@ function mostrarPratoDaUrl() {
     }
   }
 }
+
+window.receberPratosParaCliente = function(data) {
+  let arrayPratos = [];
+  for (const dia in data) {
+    data[dia].forEach(prato => {
+      arrayPratos.push({
+        nome: prato.prato || prato.nome,
+        diaSemana: prato.diaSemana || dia,
+        imagem: prato.imagem,
+        oculto: prato.oculto // <-- Adiciona isto!
+      });
+    });
+  }
+  arrayPratos = ajustarUrlsImagens(arrayPratos);
+
+  // Pega os dias selecionados pelo cliente (checkboxes)
+  const diasSelecionados = Array.from(document.querySelectorAll('#diaSemanaCliente input:checked'))
+    .map(input => input.value);
+
+  mostrarTelaSelecaoPratos(arrayPratos, diasSelecionados);
+
+  if (window.receberPratosParaCliente) delete window.receberPratosParaCliente;
+};
+
 </script>
 </body>
 </html>
