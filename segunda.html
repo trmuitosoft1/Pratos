@@ -554,8 +554,8 @@
     <option value="2">Terça-feira</option>
     <option value="3">Quarta-feira</option>
     <option value="4">Quinta-feira</option>
-    <option value="5">Sexta-feira</option>
-     <option value="5">Sábado</option>
+    <option value="5">Sexta-feira</option>␊
+     <option value="6">Sábado</option>
   </select>
   <button onclick="verTodosOsPratos()">Alterar Pratos</button>
   <ul id="pratos-list"></ul>
@@ -1265,7 +1265,7 @@ function guardarPrato() {
   redimensionarImagem(fileInput.files[0], 600, 600, function(base64Image) {
     const nomePrato = nomeInput.value.trim();
     const diaSemanaNumero = diaSelect.value;
-    const dias = ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira"];
+    const dias = ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
     const diaSemanaTexto = dias[Number(diaSemanaNumero) - 1];
     console.log("Enviando prato:", nomePrato, diaSemanaTexto);
 
@@ -1411,8 +1411,8 @@ function adicionarEntrada() {
       <option value="2">Terça-feira</option>
       <option value="3">Quarta-feira</option>
       <option value="4">Quinta-feira</option>
-      <option value="5">Sexta-feira</option>
-       <option value="5">Sábado</option>
+      <option value="5">Sexta-feira</option>␊
+       <option value="6">Sábado</option>
     </select>
   `;
   container.appendChild(novaEntrada);
@@ -1580,7 +1580,8 @@ function getDiaSemanaTexto(numero) {
     2: 'Terça-feira',
     3: 'Quarta-feira',
     4: 'Quinta-feira',
-    5: 'Sexta-feira'
+    5: 'Sexta-feira',
+    6: 'Sábado'
   };
   return dias[Number(numero)] || String(numero);
 }
