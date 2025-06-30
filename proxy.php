@@ -21,4 +21,4 @@ if ($response === false) {
 } else {
     echo $response;
 }
-curl_close($ch);
+curl_close($ch);␍␊
