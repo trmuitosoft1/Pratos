@@ -1201,10 +1201,10 @@ function enviarReservaParaSheets(nomeCliente, pratosSelecionados) {
     if (formulario) formulario.style.display = 'block';
     const botoesReserva = document.getElementById('botoesReserva');
     if (botoesReserva) botoesReserva.style.display = 'none';
-  })
-  .catch(() => {
-    alert('Reserva enviada .');
-  });
+   })␊
+  .catch(() => {␊
+    alert('Erro ao enviar reserva!');
+  });␊
 }
 
 const nomesImagens = [
