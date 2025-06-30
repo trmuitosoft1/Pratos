@@ -748,9 +748,15 @@ function mostrarTelaSelecaoPratos(pratos, diasSelecionados) {
 
   // Agrupa os pratos por dia
   const pratosPorDia = {};
-  diasSelecionados.forEach(dia => {
+diasSelecionados.forEach(dia => {
     pratosPorDia[dia] = pratos.filter(prato => {
-      return prato.diaSemana == dia || getDiaSemanaTexto(prato.diaSemana) == dia;
+      const mesmoDia = prato.diaSemana == dia || getDiaSemanaTexto(prato.diaSemana) == dia;
+      const estaVisivel = !(
+        String(prato.oculto).toLowerCase() === "ocultado" ||
+        String(prato.oculto).toUpperCase() === "TRUE" ||
+        prato.oculto === true
+      );
+      return mesmoDia && estaVisivel;
     });
   });
 
@@ -791,36 +797,21 @@ function mostrarTelaSelecaoPratos(pratos, diasSelecionados) {
         cell.style.padding = '12px';
         cell.style.background = '#fafafa';
         cell.style.transition = '0.2s';
-
-        // Se o prato está oculto, mostra como desativado e não permite selecionar
-        if (
-          String(prato.oculto).toLowerCase() === "ocultado" ||
-          String(prato.oculto).toUpperCase() === "TRUE"
-        ) {
-          cell.style.opacity = '0.5';
-          cell.style.pointerEvents = 'none';
-          cell.innerHTML = `
-            <img src="${prato.imagem || 'https://dummyimage.com/150x150/cccccc/000000&text=Sem+Imagem'}" 
-                 alt="Imagem do Prato" style="max-width:120px; border-radius:8px;">
-            <p style="margin: 8px 0 0 0; font-weight: bold;">${prato.nome}</p>
-            <span style="color:red; font-size:14px;">Prato não disponível</span>
-          `;
-        } else {
-          cell.innerHTML = `
-            <img src="${prato.imagem || 'https://dummyimage.com/150x150/cccccc/000000&text=Sem+Imagem'}" 
-                 alt="Imagem do Prato" style="max-width:120px; border-radius:8px;">
-            <p style="margin: 8px 0 0 0; font-weight: bold;">${prato.nome}</p>
-          `;
-          cell.onclick = () => {
-            if (cell.classList.contains('selected')) {
-              cell.classList.remove('selected');
-              pratosSelecionadosArr = pratosSelecionadosArr.filter(p => p !== prato);
-            } else {
-              cell.classList.add('selected');
-              pratosSelecionadosArr.push(prato);
-            }
-          };
-        }
+cell.innerHTML = `
+          <img src="${prato.imagem || 'https://dummyimage.com/150x150/cccccc/000000&text=Sem+Imagem'}"
+               alt="Imagem do Prato" style="max-width:120px; border-radius:8px;">
+          <p style="margin: 8px 0 0 0; font-weight: bold;">${prato.nome}</p>
+        `;
+        cell.onclick = () => {
+          if (cell.classList.contains('selected')) {
+            cell.classList.remove('selected');
+            pratosSelecionadosArr = pratosSelecionadosArr.filter(p => p !== prato);
+          } else {
+            cell.classList.add('selected');
+            pratosSelecionadosArr.push(prato);
+          }
+        };
+       
       } else {
         cell.style.background = 'transparent';
         cell.style.border = 'none';
