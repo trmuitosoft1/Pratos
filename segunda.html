@@ -554,7 +554,7 @@
     <option value="2">Terça-feira</option>
     <option value="3">Quarta-feira</option>
     <option value="4">Quinta-feira</option>
-    <option value="5">Sexta-feira</option>␊
+    <option value="5">Sexta-feira</option>
      <option value="6">Sábado</option>
   </select>
   <button onclick="verTodosOsPratos()">Alterar Pratos</button>
@@ -881,7 +881,7 @@ function carregarPratosRegistrados() {
   document.body.appendChild(script);
 }
 window.addEventListener("load", () => {
-  carregarPratosRegistrados();␊
+  carregarPratosRegistrados();
   // exibirPratos();
 });
 function submeter() {
@@ -1170,10 +1170,10 @@ function enviarReservaParaSheets(nomeCliente, pratosSelecionados) {
     if (formulario) formulario.style.display = 'block';
     const botoesReserva = document.getElementById('botoesReserva');
     if (botoesReserva) botoesReserva.style.display = 'none';
-   })␊
-  .catch(() => {␊
+   })
+  .catch(() => {
     alert('Erro ao enviar reserva!');
-  });␊
+  });
 }
 
 
@@ -1246,7 +1246,7 @@ function exibirPratos() {
     document.getElementById('editor').style.display = 'block';
   }
 window.addEventListener("load", () => {
-  exibirPratos();␊
+  exibirPratos();
 });
 
 
@@ -1411,7 +1411,7 @@ function adicionarEntrada() {
       <option value="2">Terça-feira</option>
       <option value="3">Quarta-feira</option>
       <option value="4">Quinta-feira</option>
-      <option value="5">Sexta-feira</option>␊
+      <option value="5">Sexta-feira</option>
        <option value="6">Sábado</option>
     </select>
   `;
