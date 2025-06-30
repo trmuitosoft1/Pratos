@@ -555,7 +555,7 @@
     <option value="3">Quarta-feira</option>
     <option value="4">Quinta-feira</option>
     <option value="5">Sexta-feira</option>
-     <option value="5">Sabado</option>
+     <option value="5">Sábado</option>
   </select>
   <button onclick="verTodosOsPratos()">Alterar Pratos</button>
   <ul id="pratos-list"></ul>
@@ -955,7 +955,8 @@ function converterDia(diaString) {
     "Terça-feira": 2,
     "Quarta-feira": 3,
     "Quinta-feira": 4,
-    "Sexta-feira": 5
+    "Sexta-feira": 5,
+     "Sábado": 6
   };
   if (typeof diaString === "string") {
     return dias[diaString] || null;
@@ -1159,7 +1160,8 @@ function getDiaSemanaTexto(numero) {
     2: 'Terça-feira',
     3: 'Quarta-feira',
     4: 'Quinta-feira',
-    5: 'Sexta-feira'
+    5: 'Sexta-feira',
+    6: 'Sábado'
   };
   return dias[numero] || 'Dia inválido';
 }
@@ -1258,7 +1260,8 @@ function getDiaSemanaTexto(numero) {
     "Terça-feira",
     "Quarta-feira",
     "Quinta-feira",
-    "Sexta-feira"
+    "Sexta-feira",
+    "Sábado"
   ];
   return dias[Number(numero)] || "";
 }
@@ -1472,6 +1475,7 @@ function adicionarEntrada() {
       <option value="3">Quarta-feira</option>
       <option value="4">Quinta-feira</option>
       <option value="5">Sexta-feira</option>
+       <option value="5">Sábado</option>
     </select>
   `;
   container.appendChild(novaEntrada);
@@ -1553,7 +1557,8 @@ function verTodosOsPratos() {
         2: 'Terça-feira',
         3: 'Quarta-feira',
         4: 'Quinta-feira',
-        5: 'Sexta-feira'
+        5: 'Sexta-feira',
+        6: 'Sábado'
       };
       return dias[Number(numero)] || String(numero);
     }
