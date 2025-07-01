@@ -1088,7 +1088,8 @@ function salvarPratosSelecionados(pratosSelecionadosArr) {
       modo: "reserva"
     };
     return fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec", {
-        method: "POST",
+        method: "POST", 
+      mode:'no-cors',
         headers: {
           "Content-Type": "application/json"
         },
