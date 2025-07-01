@@ -1145,15 +1145,15 @@ function enviarReservaParaSheets(nomeCliente, pratosSelecionados) {
   Promise.all(pratosSelecionados.map(pratoObj => {
    
  const cliente = document.getElementById('clienteId').value;
-  const dados = {
+const dados = {
     nome: nomeCliente,
     prato: pratoObj.nome,
     diaSemana: pratoObj.dia || pratoObj.diaSemana,
-    cliente,
     modo: "reserva"
   };
-  return fetch(`${scriptURL}?cliente=${encodeURIComponent(cliente)}`, {
+  return fetch(scriptURL, {
     method: "POST",
+    mode: "no-cors",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(dados)
   });
