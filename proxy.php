@@ -4,6 +4,8 @@ header("Content-Type: application/json");
 
 $data = file_get_contents("php://input");
 
+$payload = json_decode($data, true);
+$cliente = urlencode($payload['cliente']);
 $ch = curl_init("https://script.google.com/macros/s/AKfycbwADm0DIHEoqlSyEZIhX9tmPX9y25t_F_fxy8FXIxDrCkVyh1AxUG3cuS3otXA3sD7-/exec?cliente={$cliente}");
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
 curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
