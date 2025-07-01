@@ -2290,6 +2290,10 @@ function getDiaSemanaTexto(numero) {
 // No frontend
 
 function enviarReservaParaSheets(nomeCliente, pratosSelecionados) {
+  console.log("Função enviarReservaParaSheets chamada.");
+  console.log("Nome do cliente:", nomeCliente);
+  console.log("Pratos selecionados:", pratosSelecionados);
+
   if (!nomeCliente || !pratosSelecionados || !pratosSelecionados.length) {
     alert('Preencha o nome e selecione pelo menos um prato.');
     return;
@@ -2303,19 +2307,23 @@ function enviarReservaParaSheets(nomeCliente, pratosSelecionados) {
       modo: "reserva"
     };
 
-    console.log("A enviar dados:", dados);
+    console.log("A enviar:", dados);
 
     return fetch(scriptURL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify(dados)
     })
       .then(response => {
+        console.log("Resposta recebida:", response);
         if (!response.ok) throw new Error("Erro de rede");
         return response.json();
       })
       .then(data => {
-        if (!data.sucesso) throw new Error(data.erro || "Erro na resposta do servidor");
+        console.log("Resposta JSON:", data);
+        if (!data.sucesso) throw new Error(data.erro || "Erro no backend");
       });
   }))
     .then(() => {
@@ -2329,9 +2337,7 @@ function enviarReservaParaSheets(nomeCliente, pratosSelecionados) {
       alert('Erro ao enviar reserva: ' + err.message);
     });
 }
-
 }
-
 
 function handleResponse(data) {
 
