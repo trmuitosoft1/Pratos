@@ -679,42 +679,42 @@ function verPratosFiltradosPorDias(diasSelecionados) {
  
 }
 // Substitua o onclick do botão "Ver Prato" por esta função:
-document.getElementById('btnVer').onclick = function () {
-  const nome = document.getElementById('nome').value.trim();
-const diasSelecionados = Array.from(document.querySelectorAll('#diaSemanaCliente input:checked'))
-  .map(input => input.value);
- 
-if (!nome || diasSelecionados.length === 0) {
+document.getElementById('btnVer').onclick = function () {␊
+  const nome = document.getElementById('nome').value.trim();␊
+  const diasSelecionados = Array.from(
+    document.querySelectorAll('#diaSemanaCliente input:checked')
+  ).map(input => input.value);
+
+  if (!nome || diasSelecionados.length === 0) {
     alert('Por favor, preencha seu nome e selecione pelo menos um dia.');
     return;
   }
 
   // Busca pratos do backend (Google Sheets) via JSONP
-window.receberPratosParaCliente = function(data) {
-mostrarTelaSelecaoPratos(arrayPratos, diasSelecionados);
-  };
-};
-  let arrayPratos = [];
-for (const dia in data) {
-  data[dia].forEach(prato => {
-    console.log("prato recebido:", prato); // <-- Adiciona isto
-    arrayPratos.push({
-      nome: prato.prato || prato.nome,
-      diaSemana: prato.diaSemana || dia,
-      imagem: prato.imagem,
-      oculto: prato.oculto // <-- Mantém isto!
-    });
-  });
+  window.receberPratosParaCliente = function (data) {
+    const arrayPratos = [];
+    for (const dia in data) {
+      data[dia].forEach(prato => {
+        console.log('prato recebido:', prato);
+        arrayPratos.push({
+          nome: prato.prato || prato.nome,
+          diaSemana: prato.diaSemana || dia,
+          imagem: prato.imagem,
+          oculto: prato.oculto,
+        });
+      });
+    }
 
-}
-  console.log("Array de pratos:", arrayPratos);
-  mostrarTelaSelecaoPratos(arrayPratos, diasSelecionados);
-  delete window.receberPratosParaCliente;
-};
+    console.log('Array de pratos:', arrayPratos);
+    mostrarTelaSelecaoPratos(arrayPratos, diasSelecionados);
+    delete window.receberPratosParaCliente;
+  };
+
   const script = document.createElement('script');
-  script.src = 'https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec?modo=pratos&callback=receberPratosParaCliente';
-  document.body.appendChild(script);
-};
+  script.src =
+    'https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec?modo=pratos&callback=receberPratosParaCliente';
+  document.body.appendChild(script);␊
+};␊
 
 
 function mostrarTelaSelecaoPratos(pratos, diasSelecionados) {
@@ -1174,7 +1174,8 @@ function enviarReservaParaSheets(nomeCliente, pratosSelecionados) {
     if (botoesReserva) botoesReserva.style.display = 'none';
    })
   .catch(() => {
-    alert('Reserva enviada com sucesso!');
+     alert('Reserva enviada com sucesso!');
+
   });
 }
 
