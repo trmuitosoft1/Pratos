@@ -2300,42 +2300,42 @@ function enviarReservaParaSheets(nomeCliente, pratosSelecionados) {
   }
 
   Promise.all(pratosSelecionados.map(pratoObj => {
-    const dados = {
-      nome: nomeCliente,
-      prato: pratoObj.nome,
-      diaSemana: pratoObj.dia || pratoObj.diaSemana,
-      modo: "reserva"
-    };
+  const dados = {
+    nome: nomeCliente,
+    prato: pratoObj.nome,
+    diaSemana: pratoObj.dia || pratoObj.diaSemana,
+    modo: "reserva"
+  };
 
-    console.log("A enviar:", dados);
-
-    return fetch(scriptURL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(dados)
+  return fetch(scriptURL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(dados)
+  })
+    .then(response => {
+      if (!response.ok) throw new Error("Network error");
+      return response.json();
     })
-      .then(response => {
-        console.log("Resposta recebida:", response);
-        if (!response.ok) throw new Error("Erro de rede");
-        return response.json();
-      })
-      .then(data => {
-        console.log("Resposta JSON:", data);
-        if (!data.sucesso) throw new Error(data.erro || "Erro no backend");
-      });
-  }))
-    .then(() => {
-      alert('Reserva enviada com sucesso!');
-      document.getElementById('telaPratos')?.style?.display = 'none';
-      document.querySelector('.formulario')?.style?.display = 'block';
-      document.getElementById('botoesReserva')?.style?.display = 'none';
-    })
-    .catch((err) => {
-      console.error("Erro ao enviar reserva:", err);
-      alert('Erro ao enviar reserva: ' + err.message);
+    .then(data => {
+      if (!data.sucesso) throw new Error("Backend error");
     });
+}))  // <- apenas 1 parêntesis para fechar o Promise.all(...)
+  .then(() => {
+    alert('Reserva enviada com sucesso!');
+    const telaPratos = document.getElementById('telaPratos');
+    if (telaPratos) telaPratos.style.display = 'none';
+    const formulario = document.querySelector('.formulario');
+    if (formulario) formulario.style.display = 'block';
+    const botoesReserva = document.getElementById('botoesReserva');
+    if (botoesReserva) botoesReserva.style.display = 'none';
+  })
+  .catch((err) => {
+    console.error("Erro ao enviar reserva:", err);
+    alert("Erro ao enviar reserva: " + err.message);
+  });
+
 }
 }
 
