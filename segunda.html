@@ -547,7 +547,7 @@
     <img src="https://www.trsoft.pt/TRREST_20novo00.png?v=30c3kwurp0v9oh" alt="TR Rest Logo" style="height: 40px;">␊
   </div>␊
 </div>␊
-<script src="js/utils.js"></script>␊
+<script src="js/js/utils.js"></script>␊
 <script>␊
    let pratosGlobais = [];␊
    let pratosSelecionados = [];␊
@@ -683,11 +683,36 @@ window.addEventListener("DOMContentLoaded", () => {␊
       };␊
       const script = document.createElement("script");␊
       script.src = "https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec?modo=pratos&callback=receberPratosParaCliente";␊
-      script.onerror = () => {␊
-  const pratosLocal = JSON.parse(localStorage.getItem('pratos')) || [];␊
-  mostrarTelaSelecaoPratos(pratosLocal, diasSelecionados);␊
-  alert('Não foi possível carregar os pratos da internet; mostrando dados locais.');␊
-};␊
+      script.onerror = () => {
+        fetch('proxy.php', {
+          method: 'POST',
+          body: JSON.stringify({ modo: 'pratos' })
+        })
+          .then(resp => {
+            if (!resp.ok) throw new Error('Network error');
+            return resp.json();
+          })
+          .then(dados => {
+            const arrayPratos = [];
+            for (const dia in dados) {
+              dados[dia].forEach(prato => {
+                arrayPratos.push({
+                  nome: prato.prato || prato.nome,
+                  diaSemana: prato.diaSemana || dia,
+                  imagem: prato.imagem,
+                  oculto: prato.oculto,
+                });
+              });
+            }
+            mostrarTelaSelecaoPratos(arrayPratos, diasSelecionados);
+          })
+          .catch(() => {
+            const pratosLocal = JSON.parse(localStorage.getItem('pratos')) || [];
+            mostrarTelaSelecaoPratos(pratosLocal, diasSelecionados);
+            alert('Não foi possível carregar os pratos da internet; mostrando dados locais.');
+          });
+      };
+
 ␊
       document.body.appendChild(script);␊
     });␊
