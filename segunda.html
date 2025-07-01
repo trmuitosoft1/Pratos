@@ -86,42 +86,25 @@
     }
 
     function carregarPratos() {
-  fetch(`${scriptURL}?modo=pratos&callback=receberTodosPratosAdmin`)
-    .then(response => response.text())
-    .then(jsonp => {
-      const callbackPrefix = 'receberTodosPratosAdmin(';
-      const callbackSuffix = ');';
-      if (jsonp.startsWith(callbackPrefix) && jsonp.endsWith(callbackSuffix)) {
-        const jsonData = jsonp.slice(callbackPrefix.length, -callbackSuffix.length);
-        const data = JSON.parse(jsonData);
-        const lista = document.getElementById('listaPratos');
-        lista.innerHTML = '';
-        pratosSelecionados = [];
+      fetch(`${scriptURL}?modo=pratos`)
+        .then(response => response.json())
+        .then(data => {
+          const lista = document.getElementById('listaPratos');
+          lista.innerHTML = '';
+          pratosSelecionados = [];
 
-        for (const dia in data) {
-          const ul = document.createElement('ul');
-          ul.innerHTML = `<strong>${dia}</strong>`;
-          data[dia].forEach(prato => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-              <label>
-                <input type="checkbox" onchange="selecionarPrato(this, '${prato.nome}', '${dia}')">
-                ${prato.nome}
-              </label>`;
-            ul.appendChild(li);
-          });
-          lista.appendChild(ul);
-        }
-      } else {
-        console.error("Resposta JSONP inválida:", jsonp);
-        alert("Erro ao carregar os pratos.");
-      }
-    })
-    .catch(err => {
-      console.error("Erro ao buscar pratos:", err);
-      alert("Erro ao buscar pratos.");
-    });
-});
+          for (const dia in data) {
+            const ul = document.createElement('ul');
+            ul.innerHTML = `<strong>${dia}</strong>`;
+            data[dia].forEach(prato => {
+              const li = document.createElement('li');
+              li.innerHTML = `
+                <label>
+                  <input type="checkbox" onchange="selecionarPrato(this, '${prato.prato || prato.nome}', '${dia}')">
+                  ${prato.prato || prato.nome}
+                </label>`;
+              ul.appendChild(li);
+            });
             lista.appendChild(ul);
           }
         });
