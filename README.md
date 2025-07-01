@@ -36,6 +36,9 @@ The tests use [Jest](https://jestjs.io/).
 
 Open `index.html` in a browser to load the initial page. It redirects to `segunda.html`, which contains the main interface for selecting and reserving dishes. You can serve the project with any static file server or open the files directly if your browser allows loading local JavaScript.
 
+> **Note**
+> `index.html` seeds `localStorage` with example dishes. Open it before `segunda.html` so the list of dishes is available.
+
 ## Google Apps Script Endpoint
 
 Both `segunda.html` and `proxy.php` communicate with the same Google Apps Script.
