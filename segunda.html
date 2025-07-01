@@ -474,12 +474,12 @@
 
 <div id="prato" style="display:none;">
   <h2>Selecione os Pratos</h2>
-  <div id="listaPratos" class="checkbox-container"></div>␊
+  <div id="listaPratos" class="checkbox-container"></div>
 </div>
 
 <div id="telaPratos" style="display:none; flex-direction:column; min-height:80vh;">
   <h3>Selecione os Pratos</h3>
-  <div id="listaPratosTela" style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center;"></div>␊
+  <div id="listaPratosTela" style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center;"></div>
   <div id="botoesReserva" style="display:flex; flex-direction:row; gap:20px; justify-content:center; margin-top:30px;">
     <button onclick="salvarPratosSelecionados()">Concluir Reserva</button>
   <button type="button" onclick="voltarMenu()">Voltar</button>
@@ -547,7 +547,7 @@
     <img src="https://www.trsoft.pt/TRREST_20novo00.png?v=30c3kwurp0v9oh" alt="TR Rest Logo" style="height: 40px;">
   </div>
 </div>
-<script src="js/utils.js"></script>
+<script src="js/js/utils.js"></script>
 <script>
    let pratosGlobais = [];
    let pratosSelecionados = [];
@@ -1108,6 +1108,7 @@ function salvarPratosSelecionados(pratosSelecionadosArr) {
     document.getElementById('botoesReserva').style.display = 'none';
   }).catch(() => {
     alert('Erro ao enviar reserva.');
+  
   });
 }
 function getDiaSemanaTexto(numero) {
@@ -1158,11 +1159,11 @@ const dados = {
     const botoesReserva = document.getElementById('botoesReserva');
     if (botoesReserva) botoesReserva.style.display = 'none';
    })
-  .catch(() => {␊
+  .catch(() => {
      alert('Erro ao enviar reserva.');
-␊
-  });␊
-}␊
+
+  });
+}
 
 
 
