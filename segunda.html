@@ -486,7 +486,7 @@
 </label>
 </div>
 <div id="containerPratos" style="display:none;"></div>
-<div id="verPratosContainer"></div>
+<div id="verPratosContainer" style="display:none;"></div>
 <button id="btnVer" onclick="verificarDiasEChamar()">Ver Prato</button>
 <div id="grid-container" style="display: none;" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"></div>
 
@@ -615,10 +615,8 @@ function receberDadosSheets(data) {
   }
 
   pratosGlobais = arrayPratos;
-  localStorage.setItem('pratos', JSON.stringify(arrayPratos));
+localStorage.setItem('pratos', JSON.stringify(arrayPratos));
 
-  // Exibir pratos apenas após garantir que estão prontos
-  exibirPratos(); // <-- CHAMADA CORRETA AQUI
 }
 
 function voltarParaListaPratos() {
@@ -685,11 +683,14 @@ document.getElementById('btnVer').onclick = function () {
   const nome = document.getElementById('nome').value.trim();
 const diasSelecionados = Array.from(document.querySelectorAll('#diaSemanaCliente input:checked'))
   .map(input => input.value);
-  if (!nome || diasSelecionados.length === 0) {
+ 
+if (!nome || diasSelecionados.length === 0) {
     alert('Por favor, preencha seu nome e selecione pelo menos um dia.');
     return;
   }
 
+  exibirPratos();
+  document.getElementById('verPratosContainer').style.display = 'block';
   // Busca pratos do backend (Google Sheets) via JSONP
 window.receberPratosParaCliente = function(data) {
   let arrayPratos = [];
@@ -1240,17 +1241,11 @@ function exibirPratos() {
       alert("Seja bem vindo admin.");
     }
   }
-
-  function editarPratos() {
+function editarPratos() {
     document.getElementById('opcoesAdmin').style.display = 'none';
     document.getElementById('editor').style.display = 'block';
   }
-window.addEventListener("load", () => {
-  exibirPratos();
-});
-
-
-
+ 
 function guardarPrato() {
   console.log("Função guardarPrato chamada!");
   const fileInput = document.querySelector('.novaImagem');
