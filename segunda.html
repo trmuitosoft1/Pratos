@@ -689,10 +689,11 @@ if (!nome || diasSelecionados.length === 0) {
     return;
   }
 
-  exibirPratos();
-  document.getElementById('verPratosContainer').style.display = 'block';
   // Busca pratos do backend (Google Sheets) via JSONP
 window.receberPratosParaCliente = function(data) {
+mostrarTelaSelecaoPratos(arrayPratos, diasSelecionados);
+  };
+};
   let arrayPratos = [];
 for (const dia in data) {
   data[dia].forEach(prato => {
