@@ -1129,8 +1129,6 @@ function enviarReservaParaSheets(nomeCliente, pratosSelecionados) {
   }
 
   Promise.all(pratosSelecionados.map(pratoObj => {
-   
- const cliente = document.getElementById('clienteId').value;
 const dados = {
     nome: nomeCliente,
     prato: pratoObj.nome,
