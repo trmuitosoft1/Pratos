@@ -2290,91 +2290,47 @@ function getDiaSemanaTexto(numero) {
 // No frontend
 
 function enviarReservaParaSheets(nomeCliente, pratosSelecionados) {
-
   if (!nomeCliente || !pratosSelecionados || !pratosSelecionados.length) {
-
     alert('Preencha o nome e selecione pelo menos um prato.');
-
     return;
-
   }
 
-
-
   Promise.all(pratosSelecionados.map(pratoObj => {
+    const dados = {
+      nome: nomeCliente,
+      prato: pratoObj.nome,
+      diaSemana: pratoObj.dia || pratoObj.diaSemana,
+      modo: "reserva"
+    };
 
-const dados = {
+    console.log("A enviar dados:", dados);
 
-    nome: nomeCliente,
-
-    prato: pratoObj.nome,
-
-    diaSemana: pratoObj.dia || pratoObj.diaSemana,
-
-    modo: "reserva"
-
-  };
-
-  return fetch(scriptURL, {
-
-    method: "POST",
-
-    headers: { "Content-Type": "application/json" },
-
-    body: JSON.stringify(dados)
-
-  })
-
-    .then(response => {
-
-      if (!response.ok) throw new Error("Network error");
-
-      return response.json();
-
+    return fetch(scriptURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dados)
     })
-
-    .then(data => {
-
-      if (!data.sucesso) throw new Error("Backend error");
-
-    });
-
+      .then(response => {
+        if (!response.ok) throw new Error("Erro de rede");
+        return response.json();
+      })
+      .then(data => {
+        if (!data.sucesso) throw new Error(data.erro || "Erro na resposta do servidor");
+      });
   }))
-
-  .then(() => {
-
-    alert('Reserva enviada com sucesso!');
-
-    // Esconde a tela de pratos e mostra o formulário principal, se existirem
-
-    const telaPratos = document.getElementById('telaPratos');
-
-    if (telaPratos) telaPratos.style.display = 'none';
-
-    const formulario = document.querySelector('.formulario');
-
-    if (formulario) formulario.style.display = 'block';
-
-    const botoesReserva = document.getElementById('botoesReserva');
-
-    if (botoesReserva) botoesReserva.style.display = 'none';
-
-   })
-
-  .catch(() => {
-
-     alert('Erro ao enviar reserva.');
-
-
-
-  });
-
+    .then(() => {
+      alert('Reserva enviada com sucesso!');
+      document.getElementById('telaPratos')?.style?.display = 'none';
+      document.querySelector('.formulario')?.style?.display = 'block';
+      document.getElementById('botoesReserva')?.style?.display = 'none';
+    })
+    .catch((err) => {
+      console.error("Erro ao enviar reserva:", err);
+      alert('Erro ao enviar reserva: ' + err.message);
+    });
 }
 
-
-
-
-
+}
 
 
 function handleResponse(data) {
@@ -2385,15 +2341,11 @@ function handleResponse(data) {
 
   }
 
-
-
   const script = document.createElement('script');
 
   script.src = 'https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec?modo=ler&callback=handleResponse';
 
   document.body.appendChild(script);
-
-
 
   function mostrarLogin() {
 
@@ -2405,11 +2357,7 @@ function handleResponse(data) {
 
     document.querySelector(".formulario").style.display = 'none';
 
-    document.getElementById('prato').style.display = 'none';
-
-    
-
-    
+    document.getElementById('prato').style.display = 'none';    
 
   }
 
@@ -2428,7 +2376,6 @@ function exibirPratos() {
     return;
 
   }
-
 
 
   pratosGlobais.forEach(prato => {
@@ -2481,8 +2428,6 @@ function editarPratos() {
 
   }
 
- 
-
 function guardarPrato() {
 
   console.log("Função guardarPrato chamada!");
@@ -2500,8 +2445,6 @@ function guardarPrato() {
     return;
 
   }
-
-
 
   // Redimensiona/comprime a imagem antes de enviar
 
