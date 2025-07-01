@@ -1,6 +1,7 @@
 # Pratos
 
-A small web application to manage and reserve dishes of the day. The project includes simple HTML pages, JavaScript helpers and a PHP proxy used to forward requests to a Google Apps Script.
+A small web application to manage and reserve dishes of the day. The project includes simple HTML pages, JavaScript helpers and a PHP proxy used to forward requests to a Google Apps Script. All reservation requests are sent through `proxy.php` so that the response from the Google service can be read normally without relying on `no-cors` mode.
+
 
 ## Prerequisites
 
