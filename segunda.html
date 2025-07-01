@@ -1089,20 +1089,26 @@ function salvarPratosSelecionados(pratosSelecionadosArr) {
       modo: "reserva"
     };
     return fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec", {
-      method: "POST",
-      mode: "no-cors",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(dados)
-    });
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dados)
+      })
+      .then(response => {
+        if (!response.ok) throw new Error("Network error");
+        return response.json();
+      })
+      .then(data => {
+        if (!data.sucesso) throw new Error("Backend error");
+      });
   })).then(() => {
     alert('Reserva enviada com sucesso!');
     document.getElementById('telaPratos').style.display = 'none';
     document.querySelector('.formulario').style.display = 'block';
     document.getElementById('botoesReserva').style.display = 'none';
   }).catch(() => {
-    alert('Reserva enviada com Sucesso!');
+    alert('Erro ao enviar reserva.');
   });
 }
 function getDiaSemanaTexto(numero) {
@@ -1134,14 +1140,15 @@ const dados = {
   };
   return fetch(scriptURL, {
     method: "POST",
-    mode: "no-cors",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(dados)
-  });
-
-    .then(response => response.json())
+  })
+    .then(response => {
+      if (!response.ok) throw new Error("Network error");
+      return response.json();
+    })
     .then(data => {
-      if (!data.sucesso) throw new Error("Erro do backend");
+      if (!data.sucesso) throw new Error("Backend error");
     });
   }))
   .then(() => {
@@ -1245,7 +1252,6 @@ function enviarNovoPratoParaSheets(pratoObj) {
   console.log("Enviando diretamente para Google Apps Script:", pratoObj);
   fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec", {
     method: "POST",
-    mode: "no-cors",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       prato: pratoObj.nome,
@@ -1254,12 +1260,19 @@ function enviarNovoPratoParaSheets(pratoObj) {
       modo: "novoPrato"
     })
   })
-  .then(response => response.json())
-  .then(() => {
-    alert("Prato enviado!");
+  .then(response => {
+    if (!response.ok) throw new Error("Network error");
+    return response.json();
+  })
+  .then(data => {
+    if (data.sucesso) {
+      alert("Prato enviado!");
+    } else {
+      alert("Erro ao enviar prato.");
+    }
   })
   .catch(() => {
-    alert("Prato enviado.");
+    alert("Erro ao enviar prato.");
   });
 }
 
@@ -1488,10 +1501,9 @@ function verTodosOsPratos() {
       btnOcultar.textContent = estaOculto ? 'Ativar' : 'Ocultar';
 
       btnOcultar.onclick = () => {
-        const novoEstado = estaOculto ? "ativarPrato" : "ocultarPrato";
+         const novoEstado = estaOculto ? "ativarPrato" : "ocultarPrato";
 fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec", {
   method: "POST",
-  mode: "no-cors",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
     modo: novoEstado,
@@ -1499,7 +1511,10 @@ fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1Ajl
     diaSemana: prato.diaSemana
   })
 })
-.then(response => response.json())
+.then(response => {
+  if (!response.ok) throw new Error("Network error");
+  return response.json();
+})
 .then(data => {
   if (data.sucesso) {
     verTodosOsPratos();
@@ -1508,7 +1523,7 @@ fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1Ajl
   }
 })
 .catch(() => {
-  alert("Prato atualizado.");
+  alert("Erro ao atualizar o prato.");
 });
       };
 
@@ -1536,11 +1551,19 @@ function limparPratoSheets(prato) {
   };
   fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec", {
     method: "POST",
-    mode: "no-cors",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(dados)
+  })
+  .then(response => {
+    if (response.ok) {
+      alert('Prato ocultado e dados limpos com sucesso (atualize a lista para ver mudanças).');
+    } else {
+      throw new Error('Network error');
+    }
+  })
+  .catch(() => {
+    alert('Erro ao ocultar prato.');
   });
-  alert('Prato ocultado e dados limpos com sucesso (atualize a lista para ver mudanças).');
 }
 
 function voltar() {
