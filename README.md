@@ -35,3 +35,14 @@ The tests use [Jest](https://jestjs.io/).
 ## Running the HTML pages
 
 Open `index.html` in a browser to load the initial page. It redirects to `segunda.html`, which contains the main interface for selecting and reserving dishes. You can serve the project with any static file server or open the files directly if your browser allows loading local JavaScript.
+
+## Google Apps Script Endpoint
+
+Both `segunda.html` and `proxy.php` communicate with the same Google Apps Script.
+The current endpoint used throughout the project is:
+
+```
+https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec
+```
+
+If you need to deploy a new script, update this URL in both files so they remain in sync.
