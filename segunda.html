@@ -445,7 +445,6 @@
     z-index: 100;
 }
 </style>
-</head>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
@@ -487,19 +486,19 @@
 </div>
 <div id="containerPratos" style="display:none;"></div>
 <div id="verPratosContainer" style="display:none;"></div>
-<button id="btnVer" onclick="verificarDiasEChamar()">Ver Prato</button>
+<button id="btnVer">Ver Prato</button>
 <div id="grid-container" style="display: none;" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"></div>
 
 </div>
 
 <div id="prato" style="display:none;">
   <h2>Selecione os Pratos</h2>
-  <div id="listaPratos" class="checkbox-container"></div>
+  <div id="listaPratos" class="checkbox-container"></div>␊
 </div>
 
 <div id="telaPratos" style="display:none; flex-direction:column; min-height:80vh;">
   <h3>Selecione os Pratos</h3>
-  <div id="listaPratos" style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center;"></div>
+  <div id="listaPratos" style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center;"></div>␊
   <div id="botoesReserva" style="display:flex; flex-direction:row; gap:20px; justify-content:center; margin-top:30px;">
     <button onclick="salvarPratosSelecionados()">Concluir Reserva</button>
   <button type="button" onclick="voltarMenu()">Voltar</button>
@@ -523,7 +522,7 @@
 </div>
 
  <div id="editor" style="display:none;">
-  <div id="listaPratos">
+ <div id="listaPratosEditor">
     <div class="entrada-prato">
       <label for="novaImagem">Imagem do prato:</label>
       <input type="file" class="novaImagem" accept="image/*">
@@ -567,7 +566,6 @@
     <img src="https://www.trsoft.pt/TRREST_20novo00.png?v=30c3kwurp0v9oh" alt="TR Rest Logo" style="height: 40px;">
   </div>
 </div>
-</body>
 <script src="js/utils.js"></script>
 <script>
    let pratosGlobais = [];
@@ -678,43 +676,41 @@ function verPratosFiltradosPorDias(diasSelecionados) {
 
  
 }
-// Substitua o onclick do botão "Ver Prato" por esta função:
-document.getElementById('btnVer').onclick = function () {␊
-  const nome = document.getElementById('nome').value.trim();␊
-  const diasSelecionados = Array.from(
-    document.querySelectorAll('#diaSemanaCliente input:checked')
-  ).map(input => input.value);
-
-  if (!nome || diasSelecionados.length === 0) {
-    alert('Por favor, preencha seu nome e selecione pelo menos um dia.');
-    return;
+window.addEventListener("DOMContentLoaded", () => {
+  const btnVer = document.getElementById("btnVer");
+  if (btnVer) {
+    btnVer.addEventListener("click", () => {
+      const nome = document.getElementById("nome").value.trim();
+      const diasSelecionados = Array.from(
+        document.querySelectorAll("#diaSemanaCliente input:checked")
+      ).map(input => input.value);
+      if (!nome || diasSelecionados.length === 0) {
+        alert("Por favor, preencha seu nome e selecione pelo menos um dia.");
+        return;
+      }
+      window.receberPratosParaCliente = function (data) {
+        const arrayPratos = [];
+        for (const dia in data) {
+          data[dia].forEach(prato => {
+            console.log("prato recebido:", prato);
+            arrayPratos.push({
+              nome: prato.prato || prato.nome,
+              diaSemana: prato.diaSemana || dia,
+              imagem: prato.imagem,
+              oculto: prato.oculto,
+            });
+          });
+        }
+        console.log("Array de pratos:", arrayPratos);
+        mostrarTelaSelecaoPratos(arrayPratos, diasSelecionados);
+        delete window.receberPratosParaCliente;
+      };
+      const script = document.createElement("script");
+      script.src = "https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec?modo=pratos&callback=receberPratosParaCliente";
+      document.body.appendChild(script);
+    });
   }
-
-  // Busca pratos do backend (Google Sheets) via JSONP
-  window.receberPratosParaCliente = function (data) {
-    const arrayPratos = [];
-    for (const dia in data) {
-      data[dia].forEach(prato => {
-        console.log('prato recebido:', prato);
-        arrayPratos.push({
-          nome: prato.prato || prato.nome,
-          diaSemana: prato.diaSemana || dia,
-          imagem: prato.imagem,
-          oculto: prato.oculto,
-        });
-      });
-    }
-
-    console.log('Array de pratos:', arrayPratos);
-    mostrarTelaSelecaoPratos(arrayPratos, diasSelecionados);
-    delete window.receberPratosParaCliente;
-  };
-
-  const script = document.createElement('script');
-  script.src =
-    'https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec?modo=pratos&callback=receberPratosParaCliente';
-  document.body.appendChild(script);␊
-};␊
+});
 
 
 function mostrarTelaSelecaoPratos(pratos, diasSelecionados) {
@@ -1190,20 +1186,6 @@ function handleResponse(data) {
   script.src = 'https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec?modo=ler&callback=handleResponse';
   document.body.appendChild(script);
 
-// Função auxiliar para obter o nome do dia da semana
-function getDiaSemanaTexto(numero) {
-  const dias = [
-    "", // índice 0 não usado
-    "Segunda-feira",
-    "Terça-feira",
-    "Quarta-feira",
-    "Quinta-feira",
-    "Sexta-feira",
-    "Sábado"
-  ];
-  return dias[Number(numero)] || "";
-}
-
   function mostrarLogin() {
     document.getElementById('titulo').style.display = 'none';
     document.getElementById('btnMenu').style.display = 'none';
@@ -1479,22 +1461,10 @@ function verTodosOsPratos() {
   const diaSelecionado = document.getElementById('diaSemanaFiltro').value;
 
   // Define o callback ANTES de adicionar o script!
-  window.receberTodosPratosAdmin = function(data) {
+ 
+ window.receberTodosPratosAdmin = function(data) {
     const pratos = [];
     const diaFiltroNum = Number(diaSelecionado);
-
-    function getDiaSemanaTexto(numero) {
-      const dias = {
-        1: 'Segunda-feira',
-        2: 'Terça-feira',
-        3: 'Quarta-feira',
-        4: 'Quinta-feira',
-        5: 'Sexta-feira',
-        6: 'Sábado'
-      };
-      return dias[Number(numero)] || String(numero);
-    }
-
     for (const dia in data) {
       data[dia].forEach(prato => {
         const diaPratoTexto = typeof (prato.diaSemana) === "number"
@@ -1570,19 +1540,7 @@ fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1Ajl
   document.body.appendChild(script);
 }
 
-// Função auxiliar para garantir que o diaSemana vai como texto correto
-function getDiaSemanaTexto(numero) {
-  const dias = {
-    1: 'Segunda-feira',
-    2: 'Terça-feira',
-    3: 'Quarta-feira',
-    4: 'Quinta-feira',
-    5: 'Sexta-feira',
-    6: 'Sábado'
-  };
-  return dias[Number(numero)] || String(numero);
-}
-  
+
 function limparPratoSheets(prato) {
   const nomePrato = String(prato.nome).trim();
   const diaSemanaTexto = getDiaSemanaTexto(prato.diaSemana);
