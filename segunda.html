@@ -674,7 +674,6 @@ window.addEventListener("DOMContentLoaded", () => {
         const arrayPratos = [];
         for (const dia in data) {
           data[dia].forEach(prato => {
-            console.log("prato recebido:", prato);
             arrayPratos.push({
               nome: prato.prato || prato.nome,
               diaSemana: prato.diaSemana || dia,
@@ -683,16 +682,22 @@ window.addEventListener("DOMContentLoaded", () => {
             });
           });
         }
-        console.log("Array de pratos:", arrayPratos);
         mostrarTelaSelecaoPratos(arrayPratos, diasSelecionados);
         delete window.receberPratosParaCliente;
       };
       const script = document.createElement("script");
       script.src = "https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec?modo=pratos&callback=receberPratosParaCliente";
+      script.onerror = () => {
+  const pratosLocal = JSON.parse(localStorage.getItem('pratos')) || [];
+  mostrarTelaSelecaoPratos(pratosLocal, diasSelecionados);
+  alert('Não foi possível carregar os pratos da internet; mostrando dados locais.');
+};
+
       document.body.appendChild(script);
     });
   }
 });
+
 
 
 function mostrarTelaSelecaoPratos(pratos, diasSelecionados) {
