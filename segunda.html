@@ -969,13 +969,11 @@ async function mostrarPratosParaCliente(diasSelecionados) {
     return;
   }
 
-  const response = await fetch('https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec', {
+   const pratos = await fetch(proxyURL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ modo: 'filtrar', dias: diasSelecionados })
-  });
-
-  const pratos = await response.json();
+  }).then(r => r.json());
 
   const container = document.getElementById('containerPratos');
   container.style.display = 'block';
@@ -1125,30 +1123,34 @@ function salvarPratosSelecionados(pratosSelecionadosArr) {
   }
 
   // Envia cada reserva individualmente
-  Promise.all(pratosSelecionados.map(p => {
+ Promise.all(pratosSelecionados.map(p => {
     const dados = {
       nome: nome,
       prato: p.nome,
       diaSemana: p.dia,
       modo: "reserva"
     };
-    return fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec", {
+    return fetch(proxyURL, {
       method: "POST",
-      mode: "no-cors",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify(dados)
-    });
-  })).then(() => {
-    alert('Reserva enviada com sucesso!');
-    document.getElementById('telaPratos').style.display = 'none';
-    document.querySelector('.formulario').style.display = 'block';
-    document.getElementById('botoesReserva').style.display = 'none';
+    }).then(r => r.json());
+  })).then(respostas => {
+    const sucesso = respostas.every(d => d.sucesso);
+    if (sucesso) {
+      alert('Reserva enviada com sucesso!');
+      document.getElementById('telaPratos').style.display = 'none';
+      document.querySelector('.formulario').style.display = 'block';
+      document.getElementById('botoesReserva').style.display = 'none';
+    } else {
+      alert('Erro ao enviar reserva!');
+    }
   }).catch(() => {
     alert('Erro ao enviar reserva!');
   });
-}
+  }
 function getDiaSemanaTexto(numero) {
   const dias = {
     1: 'Segunda-feira',
@@ -1165,17 +1167,15 @@ function enviarReservaParaSheets(nomeCliente, pratosSelecionados) {
     alert('Preencha o nome e selecione pelo menos um prato.');
     return;
   }
-
-  Promise.all(pratosSelecionados.map(pratoObj => {
+Promise.all(pratosSelecionados.map(pratoObj => {
     const dados = {
       nome: nomeCliente,
       prato: pratoObj.nome,
       diaSemana: pratoObj.dia || pratoObj.diaSemana,
       modo: "reserva"
     };
-    return fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec", {
+    return fetch(proxyURL, {
       method: "POST",
-      mode: "no-cors",
       headers: {
         "Content-Type": "application/json"
       },
@@ -1186,8 +1186,13 @@ function enviarReservaParaSheets(nomeCliente, pratosSelecionados) {
       if (!data.sucesso) throw new Error("Erro do backend");
     });
   }))
-  .then(() => {
-    alert('Reserva enviada com sucesso!');
+  .then(respostas => {
+    const sucesso = respostas.every(d => d.sucesso);
+    if (sucesso) {
+      alert('Reserva enviada com sucesso!');
+    } else {
+      alert('Erro ao enviar reserva!');
+    }
     // Esconde a tela de pratos e mostra o formulário principal, se existirem
     const telaPratos = document.getElementById('telaPratos');
     if (telaPratos) telaPratos.style.display = 'none';
@@ -1196,6 +1201,7 @@ function enviarReservaParaSheets(nomeCliente, pratosSelecionados) {
     const botoesReserva = document.getElementById('botoesReserva');
     if (botoesReserva) botoesReserva.style.display = 'none';
   })
+ 
   .catch(() => {
     alert('Reserva enviada .');
   });
@@ -1335,9 +1341,8 @@ function guardarPrato() {
 
 function enviarNovoPratoParaSheets(pratoObj) {
   console.log("Enviando diretamente para Google Apps Script:", pratoObj);
-  fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec", {
+  fetch(proxyURL, {
     method: "POST",
-    mode: "no-cors",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       prato: pratoObj.nome,
@@ -1347,11 +1352,15 @@ function enviarNovoPratoParaSheets(pratoObj) {
     })
   })
   .then(response => response.json())
-  .then(() => {
-    alert("Prato enviado!");
+  .then(data => {
+    if (data.sucesso) {
+      alert("Prato enviado!");
+    } else {
+      alert("Erro ao enviar prato.");
+    }
   })
   .catch(() => {
-    alert("Prato enviado.");
+    alert("Erro ao enviar prato.");
   });
 }
 
@@ -1593,27 +1602,26 @@ function verTodosOsPratos() {
 
       btnOcultar.onclick = () => {
         const novoEstado = estaOculto ? "ativarPrato" : "ocultarPrato";
-fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec", {
-  method: "POST",
-  mode: "no-cors",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    modo: novoEstado,
-    prato: prato.nome,
-    diaSemana: prato.diaSemana
-  })
-})
-.then(response => response.json())
-.then(data => {
-  if (data.sucesso) {
-    verTodosOsPratos();
-  } else {
-    alert("Erro ao atualizar o estado do prato.");
-  }
-})
-.catch(() => {
-  alert("Prato atualizado.");
-});
+        fetch(proxyURL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            modo: novoEstado,
+            prato: prato.nome,
+            diaSemana: prato.diaSemana
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.sucesso) {
+            verTodosOsPratos();
+          } else {
+            alert("Erro ao atualizar o estado do prato.");
+          }
+        })
+        .catch(() => {
+          alert("Erro ao atualizar o prato.");
+        });
       };
 
       li.appendChild(btnOcultar);
@@ -1644,20 +1652,28 @@ function getDiaSemanaTexto(numero) {
 function limparPratoSheets(prato) {
   const nomePrato = String(prato.nome).trim();
   const diaSemanaTexto = getDiaSemanaTexto(prato.diaSemana);
-  const dados = {
+ const dados = {
     modo: "limparPrato",
     prato: nomePrato,
     diaSemana: diaSemanaTexto
   };
-  fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec", {
+  fetch(proxyURL, {
     method: "POST",
-    mode: "no-cors",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(dados)
-  });
-  alert('Prato ocultado e dados limpos com sucesso (atualize a lista para ver mudanças).');
-}
-
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (data.sucesso) {
+        alert('Prato ocultado e dados limpos com sucesso (atualize a lista para ver mudanças).');
+      } else {
+        alert('Erro ao limpar prato.');
+      }
+    })
+    .catch(() => {
+      alert('Erro ao limpar prato.');
+    });
+  }
 function voltar() {
       window.history.back(); // Volta para a página anterior
     }
