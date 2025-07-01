@@ -4,7 +4,8 @@ header("Content-Type: application/json");␊
 ␊
 $data = file_get_contents("php://input");␊
 ␊
-$ch = curl_init("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec");␊
+$scriptURL = "https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec";
+$ch = curl_init($scriptURL);
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");␊
 curl_setopt($ch, CURLOPT_POSTFIELDS, $data);␊
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);␊
