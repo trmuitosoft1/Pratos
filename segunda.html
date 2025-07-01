@@ -818,7 +818,20 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
+ <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!localStorage.getItem('pratos')) {
+        const pratosDaSemana = [
+          { nome: "Bacalhau", imagem: "Imagens/bacalhau.png", diaSemana: 1, oculto: false },
+          { nome: "Bitoque", imagem: "Imagens/bitoque.png", diaSemana: 1, oculto: false },
+          { nome: "Cozido", imagem: "Imagens/cozido.png", diaSemana: 2, oculto: false },
+          { nome: "Lasanha", imagem: "Imagens/lasanha.png", diaSemana: 2, oculto: false },
+          { nome: "Frango", imagem: "Imagens/frango.png", diaSemana: 3, oculto: false }
+        ];
+        localStorage.setItem('pratos', JSON.stringify(pratosDaSemana));
+      }
+    });
+  </script>
 </head>
 
 <body>
