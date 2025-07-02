@@ -1216,10 +1216,10 @@ Promise.all(pratosSelecionados.map(pratoObj => {
     if (botoesReserva) botoesReserva.style.display = 'none';
   })
  
-  .catch(() => {
-    alert('Reserva enviada .');
-  });
-}
+  .catch(() => {␊
+    alert('Erro ao enviar reserva!');
+  });␊
+}␊
 
 const nomesImagens = [
   "bacalhau.png",
