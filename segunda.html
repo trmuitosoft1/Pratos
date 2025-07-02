@@ -593,6 +593,16 @@ window.addEventListener('load', () => {
 document.getElementById('containerPratos').style.display = 'block'; 
 const scriptURL = "https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec";
 const proxyURL = "proxy.php";
+function getDiaSemanaTexto(numero) {
+  const dias = {
+    1: "Segunda-feira",
+    2: "Terça-feira",
+    3: "Quarta-feira",
+    4: "Quinta-feira",
+    5: "Sexta-feira"
+  };
+  return dias[Number(numero)] || String(numero);
+}
 
  function verificarDiasEChamar() {
   const diasSelecionados = [];
@@ -1166,16 +1176,7 @@ function salvarPratosSelecionados(pratosSelecionadosArr) {
     alert('Erro ao enviar reserva!');
   });
   }
-function getDiaSemanaTexto(numero) {
-  const dias = {
-    1: 'Segunda-feira',
-    2: 'Terça-feira',
-    3: 'Quarta-feira',
-    4: 'Quinta-feira',
-    5: 'Sexta-feira'
-  };
-  return dias[numero] || 'Dia inválido';
-}
+
 // No frontend
 function enviarReservaParaSheets(nomeCliente, pratosSelecionados) {
   if (!nomeCliente || !pratosSelecionados || !pratosSelecionados.length) {
@@ -1267,27 +1268,13 @@ function handleResponse(data) {
   script.src = 'https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec?modo=ler&callback=handleResponse';
   document.body.appendChild(script);
 
-// Função auxiliar para obter o nome do dia da semana
-function getDiaSemanaTexto(numero) {
-  const dias = [
-    "", // índice 0 não usado
-    "Segunda-feira",
-    "Terça-feira",
-    "Quarta-feira",
-    "Quinta-feira",
-    "Sexta-feira"
-  ];
-  return dias[Number(numero)] || "";
-}
-
   function mostrarLogin() {
     document.getElementById('titulo').style.display = 'none';
     document.getElementById('btnMenu').style.display = 'none';
     document.getElementById('login').style.display = 'block';
     document.querySelector(".formulario").style.display = 'none';
     document.getElementById('prato').style.display = 'none';
-    
-    
+        
   }
 function exibirPratos() {
   const container = document.getElementById('verPratosContainer');
@@ -1571,17 +1558,7 @@ function verTodosOsPratos() {
     const pratos = [];
     const diaFiltroNum = Number(diaSelecionado);
 
-    function getDiaSemanaTexto(numero) {
-      const dias = {
-        1: 'Segunda-feira',
-        2: 'Terça-feira',
-        3: 'Quarta-feira',
-        4: 'Quinta-feira',
-        5: 'Sexta-feira'
-      };
-      return dias[Number(numero)] || String(numero);
-    }
-
+   
     for (const dia in data) {
       data[dia].forEach(prato => {
         const diaPratoTexto = typeof (prato.diaSemana) === "number"
@@ -1656,15 +1633,6 @@ function verTodosOsPratos() {
   document.body.appendChild(script);
 }
 
-// Função auxiliar para garantir que o diaSemana vai como texto correto
-function getDiaSemanaTexto(numero) {
-  const dias = {
-    1: 'Segunda-feira',
-    2: 'Terça-feira',
-    3: 'Quarta-feira',
-    4: 'Quinta-feira',
-    5: 'Sexta-feira'
-  };
   return dias[Number(numero)] || String(numero);
 }
   
