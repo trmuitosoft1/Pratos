@@ -48,16 +48,3 @@ requests through `proxy.php` you avoid CORS errors when communicating with the
 Google Apps Script.
 
 ## Google Apps Script Endpoint
-
-Both `segunda.html` and `proxy.php` communicate with the same Google Apps Script.
-The current endpoint used throughout the project is:
-
-```
-https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec
-```
-
-If you need to deploy a new script, update this URL in both files so they remain in sync.
-
-> **Note**
-> The deployed Apps Script expects a specific sheet name in the target spreadsheet.
-> If that sheet's name changes (for example, to "Sabores D´Agosto"), update the Apps Script code so it points to the new name.
