@@ -52,4 +52,4 @@ If you need to deploy a new script, update this URL in both files so they remain
 
 > **Note**
 > The deployed Apps Script expects a specific sheet name in the target spreadsheet.
-> If you change that sheet name, update the Apps Script code accordingly so it continues to work.
+> If that sheet's name changes (for example, to "Sabores D´Agosto"), update the Apps Script code so it points to the new name.
