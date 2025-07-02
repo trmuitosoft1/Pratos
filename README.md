@@ -49,3 +49,7 @@ https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGF
 ```
 
 If you need to deploy a new script, update this URL in both files so they remain in sync.
+
+> **Note**
+> The deployed Apps Script expects a specific sheet name in the target spreadsheet.
+> If you change that sheet name, update the Apps Script code accordingly so it continues to work.
