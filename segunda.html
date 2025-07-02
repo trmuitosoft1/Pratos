@@ -448,6 +448,7 @@
 </head>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="js/utils.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       if (!localStorage.getItem('pratos')) {
@@ -1415,13 +1416,13 @@ function desativarPrato(legenda) {
     estado: 'desativado', // ou outro estado que você queira atribuir
   };
 
-  fetch(scriptURL + "?modo=atualizar", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(dados),
-  })
+  fetch(proxyURL, {
+    method: "POST",␊
+    headers: {␊
+      "Content-Type": "application/json",␊
+    },␊
+    body: JSON.stringify({ ...dados, modo: "atualizar" }),
+  })␊
     .then((res) => res.json())
     .then(() => {
       alert(`O prato ${legenda} foi desativado com sucesso.`);
@@ -1432,7 +1433,11 @@ function desativarPrato(legenda) {
       console.error(err);
     });
 }
-fetch("https://script.google.com/macros/s/AKfycbysVvVdkCHTq772jeLDOIqiwolmKH1AjlzCH-DGFFGIx3bwzRA0smuyeNvTNn099LLW/exec?modo=ler")
+fetch(proxyURL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ modo: "ler" })
+  })
   .then(response => response.json())
   .then(data => {
     if (data && Array.isArray(data)) {
@@ -1519,7 +1524,11 @@ function mostrarPrato() {
 }
 
 function carregarPrato(diaSemana) {
-  fetch(`${scriptURL}?modo=ler`)
+  fetch(`${proxyURL}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ modo: "ler" })
+    })
     .then(response => response.json())
     .then(data => {
       const pratoDoDia = data.find(p => parseInt(p.dia) === diaSemana);
