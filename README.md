@@ -38,6 +38,18 @@ Open `index.html` in a browser to load the initial page. It redirects to `segund
 
 > **Note**
 > `index.html` seeds `localStorage` with example dishes. Open it before `segunda.html` so the list of dishes is available.
+## Running locally
+
+You can use PHP's built‑in server to host the files while developing. From the
+project root run:
+
+```bash
+php -S localhost:8000
+```
+
+Then open <http://localhost:8000/index.html> in your browser. By sending
+requests through `proxy.php` you avoid CORS errors when communicating with the
+Google Apps Script.
 
 ## Google Apps Script Endpoint
 
