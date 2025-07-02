@@ -1489,25 +1489,6 @@ fetch(proxyURL, {
     //alert("Erro ao carregar o prato. Verifique a conexão ou tente novamente.");
   });
 
-function voltarMenu() {
-  // Ocultar botões de reserva ao voltar para o menu inicial
-var botoesReserva = document.getElementById('botoesReserva');
-if (botoesReserva) botoesReserva.style.display = 'none';
-
-  // Ocultar todas as seções
-  document.getElementById('todosPratos').style.display = 'none';
-  document.getElementById('opcoesAdmin').style.display = 'none';
-  document.getElementById('editor').style.display = 'none';
-  document.getElementById('login').style.display = 'none';
-  document.getElementById('prato').style.display = 'none';
-
-  // Mostrar a tela inicial (formulário principal)
-  document.querySelector(".formulario").style.display = 'block';
-  document.getElementById('titulo').style.display = 'block';
-  document.getElementById('btnMenu').style.display = 'block';
-  document.querySelectorAll('#diaSemanaCliente input[type="checkbox"]').forEach(cb => cb.checked = false);
-}
-
   function cancelar() {
     document.getElementById('nome').value = '';
     document.getElementById('data').value = '';
