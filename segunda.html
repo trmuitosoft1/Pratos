@@ -608,21 +608,54 @@ function getDiaSemanaTexto(numero) {
   document.querySelectorAll('#diaSemanaCliente input[type=checkbox]:checked').forEach(cb => diasSelecionados.push(cb.value));
   mostrarPratosParaCliente(diasSelecionados);
 }
-
-
 function mostrarVisualizacaoPrato(prato) {
   const container = document.getElementById('containerPratos');
-  container.innerHTML = `
-    <div class="visualizacao-unica" style="text-align: center; padding: 20px;">
-      <h2 style="font-size: 24px; margin-bottom: 10px;">${prato.nome}</h2>
-      <img src="${prato.imagem}" alt="${prato.nome}" style="max-width: 300px; border-radius: 10px; margin-bottom: 20px;" />
-      <div class="btn-container" style="display: flex; justify-content: center; gap: 10px;">
-        <button onclick="salvarPratosSelecionados()" style="padding: 10px 20px;">Concluir Reserva</button>
-        <button onclick="voltarParaListaPratos()" style="padding: 10px 20px;">Voltar</button>
-      </div>
-    </div>
-  `;
+  container.innerHTML = '';
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'visualizacao-unica';
+  wrapper.style.textAlign = 'center';
+  wrapper.style.padding = '20px';
+
+  const h2 = document.createElement('h2');
+  h2.style.fontSize = '24px';
+  h2.style.marginBottom = '10px';
+  h2.textContent = prato.nome;
+
+  const img = document.createElement('img');
+  img.src = prato.imagem;
+  img.alt = prato.nome;
+  img.style.maxWidth = '300px';
+  img.style.borderRadius = '10px';
+  img.style.marginBottom = '20px';
+
+  const btnContainer = document.createElement('div');
+  btnContainer.className = 'btn-container';
+  btnContainer.style.display = 'flex';
+  btnContainer.style.justifyContent = 'center';
+  btnContainer.style.gap = '10px';
+
+  const btnConcluir = document.createElement('button');
+  btnConcluir.textContent = 'Concluir Reserva';
+  btnConcluir.style.padding = '10px 20px';
+  btnConcluir.onclick = salvarPratosSelecionados;
+
+  const btnVoltar = document.createElement('button');
+  btnVoltar.textContent = 'Voltar';
+  btnVoltar.style.padding = '10px 20px';
+  btnVoltar.onclick = voltarParaListaPratos;
+
+  btnContainer.appendChild(btnConcluir);
+  btnContainer.appendChild(btnVoltar);
+
+  wrapper.appendChild(h2);
+  wrapper.appendChild(img);
+  wrapper.appendChild(btnContainer);
+
+  container.appendChild(wrapper);
 }
+
+
 function voltarParaListaPratos() {
   verPratosPublicos(); // ou a função que usas para mostrar os pratos de novo
 }
@@ -821,18 +854,41 @@ function mostrarTelaSelecaoPratos(pratos, diasSelecionados) {
         ) {
           cell.style.opacity = '0.5';
           cell.style.pointerEvents = 'none';
-          cell.innerHTML = `
-            <img src="${prato.imagem || 'https://dummyimage.com/150x150/cccccc/000000&text=Sem+Imagem'}" 
-                 alt="Imagem do Prato" style="max-width:120px; border-radius:8px;">
-            <p style="margin: 8px 0 0 0; font-weight: bold;">${prato.nome}</p>
-            <span style="color:red; font-size:14px;">Prato não disponível</span>
-          `;
+
+          const img = document.createElement('img');
+          img.src = prato.imagem || 'https://dummyimage.com/150x150/cccccc/000000&text=Sem+Imagem';
+          img.alt = 'Imagem do Prato';
+          img.style.maxWidth = '120px';
+          img.style.borderRadius = '8px';
+
+          const p = document.createElement('p');
+          p.style.margin = '8px 0 0 0';
+          p.style.fontWeight = 'bold';
+          p.textContent = prato.nome;
+
+          const span = document.createElement('span');
+          span.style.color = 'red';
+          span.style.fontSize = '14px';
+          span.textContent = 'Prato não disponível';
+
+          cell.appendChild(img);
+          cell.appendChild(p);
+          cell.appendChild(span);
         } else {
-          cell.innerHTML = `
-            <img src="${prato.imagem || 'https://dummyimage.com/150x150/cccccc/000000&text=Sem+Imagem'}" 
-                 alt="Imagem do Prato" style="max-width:120px; border-radius:8px;">
-            <p style="margin: 8px 0 0 0; font-weight: bold;">${prato.nome}</p>
-          `;
+          const img = document.createElement('img');
+          img.src = prato.imagem || 'https://dummyimage.com/150x150/cccccc/000000&text=Sem+Imagem';
+          img.alt = 'Imagem do Prato';
+          img.style.maxWidth = '120px';
+          img.style.borderRadius = '8px';
+
+          const p = document.createElement('p');
+          p.style.margin = '8px 0 0 0';
+          p.style.fontWeight = 'bold';
+          p.textContent = prato.nome;
+
+          cell.appendChild(img);
+          cell.appendChild(p);
+
           cell.onclick = () => {
             if (cell.classList.contains('selected')) {
               cell.classList.remove('selected');
@@ -1008,12 +1064,20 @@ async function mostrarPratosParaCliente(diasSelecionados) {
     return;
   }
 
-  pratos.forEach(prato => {
+ pratos.forEach(prato => {
     const div = document.createElement('div');
-    div.innerHTML = `
-      <h3>${prato.nome}</h3>
-      <img src="${prato.imagem}" alt="${prato.nome}" width="100">
-    `;
+
+    const h3 = document.createElement('h3');
+    h3.textContent = prato.nome;
+
+    const img = document.createElement('img');
+    img.src = prato.imagem;
+    img.alt = prato.nome;
+    img.width = 100;
+
+    div.appendChild(h3);
+    div.appendChild(img);
+
     container.appendChild(div);
   });
 }
@@ -1108,17 +1172,30 @@ function renderizarPratosPublicos(data) {
     const imagemUrl = (prato.imagem && prato.imagem.startsWith("http"))
       ? prato.imagem
       : `https://dummyimage.com/150x150/cccccc/000000&text=${encodeURIComponent(prato.nome || 'Sem imagem')}`;
-
-    const divPrato = document.createElement('div');
+    
+const divPrato = document.createElement('div');
     divPrato.className = 'prato-publico';
-    divPrato.innerHTML = `
-      <h4>${prato.nome}</h4>
-      <p>Dia: ${prato.diaSemana}</p>
-      <img src="${imagemUrl}" alt="Imagem do prato ${prato.nome}" style="max-width:150px; border-radius: 8px;">
-    `;
+
+    const h4 = document.createElement('h4');
+    h4.textContent = prato.nome;
+
+    const p = document.createElement('p');
+    p.textContent = `Dia: ${prato.diaSemana}`;
+
+    const img = document.createElement('img');
+    img.src = imagemUrl;
+    img.alt = `Imagem do prato ${prato.nome}`;
+    img.style.maxWidth = '150px';
+    img.style.borderRadius = '8px';
+
+    divPrato.appendChild(h4);
+    divPrato.appendChild(p);
+    divPrato.appendChild(img);
+
     divPrato.onclick = () => {
       mostrarVisualizacaoPrato(prato);
     };
+    
     container.appendChild(divPrato);
   });
 }
@@ -1219,46 +1296,9 @@ Promise.all(pratosSelecionados.map(pratoObj => {
  
   .catch(() => {
     alert('Erro ao enviar reserva!');
-  });
+});
 }
 
-const nomesImagens = [
-  "bacalhau.png",
-  "frango.png",
-  "bitoque.png",
-  "cozido.png",
-  "lasanha.png"
-];
-
-// Base URL raw do GitHub onde as imagens estão hospedadas
-const baseGitHubRaw = "https://raw.githubusercontent.com/trmuitosoft1/Pratos/main/Imagens/";
- 
-function ajustarUrlsImagens(pratos) {
-  return pratos.map(p => {
-    // Se imagem não existe ou está vazia, tenta usar o nome do prato para casar com nomesImagens
-    if (!p.imagem || p.imagem.trim() === "") {
-      // Tenta achar imagem pelo nome do prato (ex: prato.nome = "bacalhau")
-      const nomeImagem = nomesImagens.find(imgName => {
-        const nomePratoSemExt = imgName.replace(/\.[^/.]+$/, "").toLowerCase(); // retira extensão e baixa
-        return p.nome.toLowerCase().includes(nomePratoSemExt);
-      });
-      if (nomeImagem) {
-        return {...p, imagem: baseGitHubRaw + nomeImagem};
-      } else {
-        // Sem imagem encontrada, usa placeholder
-        return {...p, imagem: "https://via.placeholder.com/100"};
-      }
-    } else if (!p.imagem.startsWith("http")) {
-      // Se imagem existe mas não tem URL completa, adiciona base GitHub
-      return {...p, imagem: baseGitHubRaw + p.imagem};
-    } else {
-      // Já é URL completa, deixa como está
-      return p;
-    }
-  });
-}
-
-function handleResponse(data) {
     console.log("Dados recebidos:", data);
     // Atualiza UI com os pratos
   }
@@ -1284,16 +1324,28 @@ function exibirPratos() {
     return;
   }
 
-  pratosGlobais.forEach(prato => {
+pratosGlobais.forEach(prato => {
     const div = document.createElement('div');
     div.className = 'prato-publico';
-    div.innerHTML = `
-      <h4>${prato.nome}</h4>
-      <p>Dia: ${prato.diaSemana}</p>
-      <img src="${prato.imagem}" alt="${prato.nome}" style="max-width: 150px; border-radius: 8px;">
-    `;
+
+    const h4 = document.createElement('h4');
+    h4.textContent = prato.nome;
+
+    const p = document.createElement('p');
+    p.textContent = `Dia: ${prato.diaSemana}`;
+
+    const img = document.createElement('img');
+    img.src = prato.imagem;
+    img.alt = prato.nome;
+    img.style.maxWidth = '150px';
+    img.style.borderRadius = '8px';
+
+    div.appendChild(h4);
+    div.appendChild(p);
+    div.appendChild(img);
+
     container.appendChild(div);
-  });
+  });  
 }
   function login() {
     const user = document.getElementById('user').value.trim();
@@ -1581,16 +1633,31 @@ function verTodosOsPratos() {
       return;
     }
 
-    pratos.forEach(prato => {
+     pratos.forEach(prato => {
       const li = document.createElement('li');
       li.style.position = 'relative';
       const estaOculto = prato.oculto === true;
       if (estaOculto) li.style.opacity = '0.5';
-      li.innerHTML = `
-        <img src="${prato.imagem}" alt="Imagem do Prato" style="width: 100px; border-radius: 10px; margin-bottom: 10px;">
-        <span>${prato.nome} (${getDiaSemanaTexto(prato.diaSemana)})</span>
-        <span style="color:red; font-size:14px; display:${estaOculto ? 'block' : 'none'};">Prato não disponível</span>
-      `;
+
+      const img = document.createElement('img');
+      img.src = prato.imagem;
+      img.alt = 'Imagem do Prato';
+      img.style.width = '100px';
+      img.style.borderRadius = '10px';
+      img.style.marginBottom = '10px';
+
+      const spanNome = document.createElement('span');
+      spanNome.textContent = `${prato.nome} (${getDiaSemanaTexto(prato.diaSemana)})`;
+
+      const spanEstado = document.createElement('span');
+      spanEstado.style.color = 'red';
+      spanEstado.style.fontSize = '14px';
+      spanEstado.style.display = estaOculto ? 'block' : 'none';
+      spanEstado.textContent = 'Prato não disponível';
+
+      li.appendChild(img);
+      li.appendChild(spanNome);
+      li.appendChild(spanEstado);
 
       const btnOcultar = document.createElement('button');
       btnOcultar.textContent = estaOculto ? 'Ativar' : 'Ocultar';
