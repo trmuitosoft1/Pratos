@@ -8,7 +8,14 @@ const nomesImagens = [
 
 // Base URL raw do GitHub onde as imagens estao hospedadas
 const baseGitHubRaw = "https://raw.githubusercontent.com/trmuitosoft1/Pratos/main/Imagens/";
-
+function mostrarLogin() {
+    document.getElementById('titulo').style.display = 'none';
+    document.getElementById('btnMenu').style.display = 'none';
+    document.getElementById('login').style.display = 'block';
+    document.querySelector(".formulario").style.display = 'none';
+    document.getElementById('prato').style.display = 'none';
+        
+  }
 function ajustarUrlsImagens(pratos) {
   return pratos.map(p => {
     if (!p.imagem || p.imagem.trim() === "") {
