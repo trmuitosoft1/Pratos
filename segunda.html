@@ -1220,8 +1220,8 @@ Promise.all(pratosSelecionados.map(pratoObj => {
  
   .catch(() => {
     alert('Erro ao enviar reserva!');
-  });␊
-}␊
+  });
+}
 
 const nomesImagens = [
   "bacalhau.png",
@@ -1404,12 +1404,12 @@ function desativarPrato(legenda) {
   };
 
   fetch(proxyURL, {
-    method: "POST",␊
-    headers: {␊
-      "Content-Type": "application/json",␊
-    },␊
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({ ...dados, modo: "atualizar" }),
-  })␊
+  })
     .then((res) => res.json())
     .then(() => {
       alert(`O prato ${legenda} foi desativado com sucesso.`);
@@ -1527,10 +1527,10 @@ function carregarPrato(diaSemana) {
         alert("Ainda não há prato definido para esse dia.");
       }
     })
-    .catch(err => {␊
-      console.error("Erro ao carregar o prato:", err);␊
-      alert("Erro ao carregar o prato.");␊
-    });␊
+    .catch(err => {
+      console.error("Erro ao carregar o prato:", err);
+      alert("Erro ao carregar o prato.");
+    });
 }
 
 function handleImageUpload(event) {
